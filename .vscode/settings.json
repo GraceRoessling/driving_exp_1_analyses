@@ -1,0 +1,7 @@
+{
+    "editor.formatOnType": true,
+    "[lisp]": {
+        "editor.wordSeparators": "`|;:'\",()"
+    },
+    "r.lsp.promptToInstall": false
+}
