@@ -1,0 +1,128 @@
+import pandas as pd
+import piece
+import math
+import IPython
+
+# filter dataframes --------------------------------------------------------------------------
+def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
+    na_indices = list(driving_vars_df.loc[pd.isna(driving_vars_df["current_track_piece"]), :].index)
+    driving_vars_df = driving_vars_df.drop(index = na_indices).reset_index()
+    vehicle_position_df = vehicle_position_df.drop(index = na_indices).reset_index()
+    cam_position_df = cam_position_df.drop(index = na_indices).reset_index()
+    return(cam_position_df,vehicle_position_df,driving_vars_df)
+
+def get_track_piece_indices(track_piece,cam_position_df,vehicle_position_df,driving_vars_df):
+    indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(track_piece)])
+    track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(track_piece)]
+    #print(driving_vars_df)
+    first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
+    track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
+    track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
+    return(track_piece_cam_pos,track_piece_vehicle_pos,track_piece_driving_var)
+
+def remove_substring(string_list, substring):
+    cleaned_list = []
+    for string in string_list:
+        cleaned_string = string.replace(substring, '')
+        cleaned_list.append(cleaned_string)
+    return cleaned_list
+    
+
+# transformation functions ------------------------------------------------------------------------
+# function for calculating speed
+speed = lambda x,y,z: math.sqrt(x*x + y*y + z*z)
+def get_speed_per_frame(driving_vars_df):
+    driving_vars_df = driving_vars_df.copy()
+    velocity_x = list(driving_vars_df["velocity_x"])
+    velocity_y = list(driving_vars_df["velocity_y"])
+    velocity_z = list(driving_vars_df["velocity_z"])
+
+    speed_array = []
+    
+    for i in range(0,len(velocity_x)):
+        x,y,z = velocity_x[i],velocity_y[i],velocity_z[i]
+        current_speed = speed(x,y,z)
+        speed_array.append(current_speed)
+    
+    driving_vars_df.loc[:,'velocity_magnitude'] = speed_array
+    return(driving_vars_df)
+
+map_to_steering_angle = lambda input,input_start,input_end,output_start,output_end: output_start + ((output_end - output_start) / (input_end - input_start)) * (input - input_start)
+def convert_steering_value(driving_vars_df):
+    input_start, input_end = -1, 1
+    output_start, output_end = -135, 135
+    
+    # take steering input and convert from -1 to 1 --> 0 --> 35 degrees
+    steering_array = driving_vars_df['steering_angle'].tolist()
+    steering_angle_array = []
+    for current_steering_input in steering_array:
+        steering_angle = round(map_to_steering_angle(current_steering_input, input_start, input_end, output_start, output_end), 3)
+        steering_angle_array.append(steering_angle)
+    
+    driving_vars_df.loc[:, 'steering_angle'] = steering_angle_array
+    return(driving_vars_df)
+
+# conduct analyses across groups -----------------------------------------------------------
+# general var function!
+def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,map):
+    whole_trial_driving_sim_df = trial.paths["Vehicle_DrivingSim"]
+    total_var_dict = dict() # collect total
+    track_piece_dict = dict() # collect data for each piece
+
+    if metric_type_as_string == "speed":
+        whole_trial_df_column = whole_trial_driving_sim_df["velocity_magnitude"]
+    elif metric_type_as_string == "steering":
+        whole_trial_df_column = whole_trial_driving_sim_df["steering_angle"]
+
+    # get total trial time
+    whole_trial_mean = whole_trial_df_column.mean()
+    whole_trial_var = whole_trial_df_column.var()
+    whole_trial_sd = whole_trial_df_column.std()
+    total_var_dict = {f"mean_{metric_type_as_string}":whole_trial_mean, f"var_{metric_type_as_string}":whole_trial_var, f"sd_{metric_type_as_string}":whole_trial_sd}
+
+    # iterate through track pieces and get speed info for each
+    all_track_pieces = map.pieces # list of pieces associated to a given map
+
+    for track_piece_id in all_track_pieces:
+        track_piece_object = trial.pieces[track_piece_id]
+        driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]  
+
+        if metric_type_as_string == "speed":
+            piece_df_column = driving_sim_df["velocity_magnitude"]
+        elif metric_type_as_string == "steering":
+            piece_df_column = driving_sim_df["steering_angle"]
+
+        piece_mean = piece_df_column.mean()
+        piece_var = piece_df_column.var()
+        piece_sd = piece_df_column.std()
+                
+        track_piece_dict[track_piece_id] = {f"mean_{metric_type_as_string}":piece_mean, f"var_{metric_type_as_string}":piece_var, f"sd_{metric_type_as_string}":piece_sd}
+    return(total_var_dict,track_piece_dict)
+
+
+# steering variance
+def get_lap_time_for_each_track_piece_for_one_trial(trial,map):
+    # get total trial time
+    whole_trial_driving_sim_df = trial.paths["Vehicle_DrivingSim"]
+    entire_trial_first_time_step = whole_trial_driving_sim_df["time"].iloc[0]
+    entire_trial_last_time_step = whole_trial_driving_sim_df["time"].iloc[-1]
+    entire_trial_lap_time = entire_trial_last_time_step - entire_trial_first_time_step
+    
+    # collect speed information in this dictionary
+    track_piece_lap_time_dict = dict()
+
+    # collapse the dictionary into a list
+    all_track_pieces = map.pieces # list of pieces associated to a given map
+
+    # iterate through track pieces and get speed info for each
+    for track_piece_id in all_track_pieces:
+        track_piece_object = trial.pieces[track_piece_id]
+        driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]
+                
+        first_time_step = driving_sim_df["time"].iloc[0]
+        last_time_step = driving_sim_df["time"].iloc[-1]
+        total_lap_time = last_time_step - first_time_step
+                
+        track_piece_lap_time_dict[track_piece_id] = {"lap_time":total_lap_time}
+    return(entire_trial_lap_time,track_piece_lap_time_dict)
+
