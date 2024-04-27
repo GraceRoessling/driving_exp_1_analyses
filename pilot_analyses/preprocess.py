@@ -36,7 +36,7 @@ def get_track_piece_indices(track_piece,cam_position_df,vehicle_position_df,driv
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
-    return(track_piece_driving_var,track_piece_vehicle_pos,track_piece_cam_pos)
+    return(track_piece_cam_pos,track_piece_vehicle_pos,track_piece_driving_var)
 
 # Segment data into 8 sub_dfs to analyze different track segments
 def break_down_dfs_by_track(cam_position_df,vehicle_position_df,driving_vars_df):

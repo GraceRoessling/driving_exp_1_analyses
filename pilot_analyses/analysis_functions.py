@@ -74,7 +74,7 @@ def replace_if_diff_greater_than_10(data):
 
 def convert_steering_value(driving_vars_df):
     input_start, input_end = -1,1
-    output_start,output_end = -35,35
+    output_start,output_end = -135,135
     # take steering input and convert from -1 to 1 --> 0 --> 35 degrees
     steering_array = driving_vars_df['steering_angle']
     steering_angle_array = []
@@ -82,8 +82,8 @@ def convert_steering_value(driving_vars_df):
         current_steering_input = steering_array[i]
         steering_angle = round(map_to_steering_angle(current_steering_input,input_start,input_end,output_start,output_end),3)
         steering_angle_array.append(steering_angle)
-    driving_vars_df['steering_angle_transformed'] = steering_angle_array
-    return(driving_vars_df)
+    driving_vars_df['steering_angle'] = steering_angle_array
+    return(steering_angle_array)
 
 
 
