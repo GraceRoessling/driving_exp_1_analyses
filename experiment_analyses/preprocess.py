@@ -7,6 +7,7 @@ import piece
 import map
 from IPython import embed
 import dataframe_helper_functions
+import parse_path_center_csv
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Helper funcs
@@ -27,6 +28,7 @@ def initialize_trials_for_one_subject(subject):
         trial_id = trial_string
         trial_num = count +1
         trial_object = trial.Trial(trial_id,trial_num, subject)
+        trial_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_map(trial_object)
         trial_object_list.append(trial_object)
     subject.trials = trial_object_list
 
@@ -34,13 +36,17 @@ def initialize_maps_and_pieces(subject):
     piece_obj_dict = dict() # nested dictionary that contains all values associated to each piece
     for i in range(0,10): # iterate through all ten trials
         # iterate through track pieces for a given subject
-        trial = subject.trials[i]
-        map_object = map.Map(subject,trial)
+        trial_object = subject.trials[i]
+        map_object = map.Map(subject,trial_object)
+        map_object.center_dict = parse_path_center_csv.add_dicts_to_map_object(map_object.map_number)
+
         for track_id in map_object.pieces:
-            piece_object = piece.Piece(track_id,subject,trial,map_object)
+            piece_object = piece.Piece(track_id,subject,trial_object,map_object)
+            piece_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_piece(piece_object)
             piece_obj_dict[track_id] = piece_object
-        trial.map = map_object
-        trial.pieces = piece_obj_dict
+            piece_object.center_of_track_df = map_object.center_dict[track_id]
+        trial_object.map = map_object
+        trial_object.pieces = piece_obj_dict
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Main
@@ -62,3 +68,13 @@ for subject_id in subject_dict:
             subject_object.speed[i+1] = {f"trial_total":total_speed_dict,f"trial_piece":track_piece_speed_dict}
             subject_object.steering[i+1] = {f"trial_total":total_steering_dict,f"trial_piece":track_piece_steering_dict}
             subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
+
+
+# Get the proper CSV files for each dataframe
+# for map in map.Map.map_pieces_dict:
+#     high_vis,low_vis = map.dict.values()
+#     all_track_pieces = high_vis + low_vis
+
+
+
+

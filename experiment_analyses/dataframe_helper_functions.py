@@ -26,7 +26,16 @@ def remove_substring(string_list, substring):
         cleaned_string = string.replace(substring, '')
         cleaned_list.append(cleaned_string)
     return cleaned_list
-    
+
+def get_agent_trajectory_for_each_map(trial):
+    trajectory_df = trial.paths["vehicle_movement"]
+    trajectory_df = trajectory_df[["time", "pos_x", "pos_z"]]
+    return(trajectory_df)
+
+def get_agent_trajectory_for_each_piece(piece):   
+    trajectory_piece_df = piece.dataframes["vehicle_movement"]
+    trajectory_piece_df = trajectory_piece_df[["time", "pos_x", "pos_z"]]
+    return(trajectory_piece_df)
 
 # transformation functions ------------------------------------------------------------------------
 # function for calculating speed
@@ -126,3 +135,13 @@ def get_lap_time_for_each_track_piece_for_one_trial(trial,map):
         track_piece_lap_time_dict[track_piece_id] = {"lap_time":total_lap_time}
     return(entire_trial_lap_time,track_piece_lap_time_dict)
 
+def get_unique_consecutive_strings(string_list):
+    unique_strings = []
+    prev_string = None
+    
+    for curr_string in string_list:
+        if curr_string != prev_string:
+            unique_strings.append(curr_string)
+            prev_string = curr_string
+    
+    return unique_strings
