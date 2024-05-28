@@ -70,11 +70,6 @@ for subject_id in subject_dict:
             subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
 
 
-# Get the proper CSV files for each dataframe
-# for map in map.Map.map_pieces_dict:
-#     high_vis,low_vis = map.dict.values()
-#     all_track_pieces = high_vis + low_vis
-
 
 
 

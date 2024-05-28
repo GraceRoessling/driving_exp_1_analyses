@@ -9,6 +9,19 @@ import preprocess
 import math
 from scipy.interpolate import interp1d
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+def separate_xy_values(points):
+    x_values = []
+    y_values = []
+    
+    for x, y in points:
+        x_values.append(x)
+        y_values.append(y)
+    
+    return x_values, y_values
+
 def interpolate_line(x_values, y_values, resolution):
     interp_func = interp1d(x_values, y_values, kind='linear') 
     new_x = np.linspace(min(x_values), max(x_values), resolution)
@@ -53,12 +66,11 @@ def get_xz_for_track_piece(center_x,center_z,resolution):
     
     return(x_new,z_new)
 
-def pair_lists(list1, list2):
-    paired_list = []
-    for item1 in list1:
-        for item2 in list2:
-            paired_list.append((item1, item2))
-    return paired_list
+def combine_lists(list1, list2):
+    combined_list = []
+    for i in range(min(len(list1), len(list2))):
+        combined_list.append((list1[i], list2[i]))
+    return combined_list
 
 
 def distance_to_centerline(point, centerline):
@@ -77,6 +89,40 @@ def distance_to_centerline(point, centerline):
             closest_point = (x1, y1)
 
     return min_distance, closest_point
+
+def check(list):
+    return all(i == list[0] for i in list)
+
+def trim_trajectory_line(trajectory,centerline):
+    start_collect_closest_points = []
+    end_collect_closest_points = []
+    # iterate through first few points along trajectory line
+    for count, point in enumerate(trajectory):
+        # get distance between point and center_line
+        min_distance, closest_point = distance_to_centerline(point, centerline)
+        start_collect_closest_points.append(closest_point)
+
+        if check(start_collect_closest_points) != True: # all the elements are not the same
+            unchopped_point_idx = count
+            trimmed_traj = trajectory[unchopped_point_idx:]
+            # trim_x, trim_z = separate_xy_values(trimmed_line)
+
+            # now trim the end of the list
+            
+            reverse_traj = trimmed_traj[::-1]
+            reverse_centerline = centerline[::-1]
+
+            for count, point in enumerate(reverse_traj):
+                # get distance between point and center_line
+                min_distance, closest_point = distance_to_centerline(point, reverse_centerline)
+                end_collect_closest_points.append(closest_point)
+                if check(start_collect_closest_points) != True: # all the elements are not the same
+                    unchopped_point_idx = count
+                    reverese_trimmed_traj = reverse_traj[unchopped_point_idx:]
+                    final_trimmed_traj = reverese_trimmed_traj[::-1]
+                    trim_x, trim_z = separate_xy_values(final_trimmed_traj)
+                    return(trim_x, trim_z)
+
 
 def get_track_piece_indices(track_piece,center_of_road_map1):
     indices_for_track_piece = list(center_of_road_map1.index[center_of_road_map1['Road_Name'].str.contains(track_piece)])
