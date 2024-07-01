@@ -2,8 +2,92 @@ import pandas as pd
 import piece
 import math
 import IPython
+from collections import defaultdict
 
 # filter dataframes --------------------------------------------------------------------------
+def check_repeating_sequences(df):
+    # Convert the column to a list for easier manipulation
+    col_list = df["current_track_piece"].tolist()
+    
+    # Dictionary to store the count of sequences for each unique value
+    sequence_counts = {}
+    
+    current_value = None
+    sequence_started = False
+    
+    for value in col_list:
+        if value != current_value:
+            # New value encountered
+            if sequence_started:
+                sequence_counts[current_value] = sequence_counts.get(current_value, 0) + 1
+            current_value = value
+            sequence_started = True
+        elif not sequence_started:
+            # Continuing a sequence
+            sequence_started = True
+    
+    # Check the last sequence
+    if sequence_started:
+        sequence_counts[current_value] = sequence_counts.get(current_value, 0) + 1
+    
+    # Check if any value has more than one sequence
+    return any(count > 1 for count in sequence_counts.values())
+
+def modify_duplicate_sequences(df):
+    # Convert the column to a list for easier manipulation
+    col_list = df["current_track_piece"].tolist()
+    
+    # Find all unique values in the column
+    unique_values = set(col_list)
+    
+    for value in unique_values:
+        # Find all occurrences of sequences of the value
+        sequences = []
+        start = 0
+        while start < len(col_list):
+            try:
+                start = col_list.index(value, start)
+                end = start
+                while end < len(col_list) and col_list[end] == value:
+                    end += 1
+                sequences.append((start, end))
+                start = end
+            except ValueError:
+                break
+        
+        # If there are at least two sequences of the same value
+        if len(sequences) >= 2:
+            # Modify the first sequence
+            for i in range(sequences[0][0], sequences[0][1]):
+                col_list[i] = f"{col_list[i]}_1"
+            
+            # Modify the second sequence
+            for i in range(sequences[1][0], sequences[1][1]):
+                col_list[i] = f"{col_list[i]}_2"
+    
+    # Update the DataFrame column with the modified list
+    df["current_track_piece"] = col_list
+    
+    return df
+
+def find_ranges(lst, target):
+    result = []
+    start = -1
+    
+    for i, item in enumerate(lst):
+        if item == target:
+            if start == -1:
+                start = i
+        elif start != -1:
+            result.extend([start, i-1])
+            start = -1
+    
+    if start != -1:
+        result.extend([start, len(lst)-1])
+
+    return result
+
+
 def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
     na_indices = list(driving_vars_df.loc[pd.isna(driving_vars_df["current_track_piece"]), :].index)
     driving_vars_df = driving_vars_df.drop(index = na_indices).reset_index()
@@ -11,10 +95,12 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
     cam_position_df = cam_position_df.drop(index = na_indices).reset_index()
     return(cam_position_df,vehicle_position_df,driving_vars_df)
 
-def get_track_piece_indices(track_piece,cam_position_df,vehicle_position_df,driving_vars_df):
-    indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(track_piece)])
-    track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(track_piece)]
-    #print(driving_vars_df)
+def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
+    driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
+    # if piece_object.map_number == "6"  and piece_object.id == "right_turn_short_1":
+    #     print()
+    indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
+    track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
@@ -91,7 +177,7 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
 
     # iterate through track pieces and get speed info for each
     all_track_pieces = map.pieces # list of pieces associated to a given map
-
+    if map.map_number == "6" :  print(all_track_pieces)
     for track_piece_id in all_track_pieces:
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]  
