@@ -48,31 +48,30 @@ class Map:
     }
 
     track_piece_wrap_issue = {
-        "1":{"s_turn_short" : "upward_to_downward_slope" },
-        "2":{"s_turn_short" : "upward_to_downward_slope" },
-        "3":{"s_turn_long": "upward_to_downward_slope"},
-        "4":{"s_turn_long": "upward_to_downward_slope"},
+        "1":{"s_turn_short"},
+        "2":{"s_turn_short"},
+        "3":{"s_turn_long"},
+        "4":{"s_turn_long"},
         "5":{None},
-        "6":{"s_turn_long": "upward_to_downward_slope"},
-        "7":{"s_turn_long":"upward_to_downward_slope"},
+        "6":{"s_turn_long"},
+        "7":{"s_turn_long"},
         "8":{None},  
         "9":{None},
         "10":{None}
     }
 
+# list in order of correction (rather than order of pieces along track)
     track_piece_rotation_issue = {
-        "1":{"straight_short" : 90},
-        "2":{"straight_long": 0, "straight_short": 0},
-        "3":{"right_turn_med" :0,"straight_long": 0, "straight_short":0},
-        "4":{"straight_short":0, "straight_long":90},
-        "5":{"straight_short" : 90, "straight_long" : 90},
-
-        "6":{"straight_short":90, "right_turn_short":"flip_vertical","straight_long":90, "right_turn_short": "flip_vertical"},
-        
-        "7":{"straight_long":0, 'left_turn_short':0, "straight_short":90},
-        "8":{"straight_long":0, "straight_short":0},
-        "9":{"straight_long" : 90,"straight_short": 0},
-        "10":{"straight_long":0,"straight_short":90}
+        "1":{"straight_short" : [90, "left_turn_long", ("end","start")]},
+        "2":{"straight_long": [0, "left_turn_med",("start", "start")], "straight_short": [0,"left_turn_long", ("end","end")]},
+        "3":{"right_turn_med" :[0, "right_turn_long", ("end", "end")],"straight_long": [0, "right_turn_long", ("start", "start")], "straight_short":[0, "left_turn_short", ("start", "end")]},
+        "4":{"straight_short":[0, "u_turn_short",("end", "start")], "straight_long":[90, "right_turn_short", ("start", "end")]},
+        "5":{"straight_long" : [90, "left_turn_short",("end","start")],"straight_short" : [90,"straight_long",("end","start")]},
+        "6":{"right_turn_short_1":[0,"left_turn_long", ("end", "start")],"straight_short":[0, "right_turn_short_1", ("start", "start")],"straight_long":[0, "left_turn_med", ("start", "end")], "right_turn_short_2": [0, "s_turn_long", ("end", "end")]},
+        "7":{"straight_long":[0, "right_turn_short", ("start", "start")], 'left_turn_short':[0, "right_turn_med", ("start", "start")], "straight_short":[90,"left_turn_short", ("end", "end")]},
+        "8":{"straight_long":[0,"u_turn_long",("end","end")], "straight_short":[0, "left_turn_med", ("start", "end")]},
+        "9":{"straight_long" : [90, "left_turn_med",("end","end")],"straight_short": [0, "left_turn_long",("end","end")]},
+        "10":{"straight_long":[0, "right_turn_med", ("start", "start")],"straight_short":[90, "left_turn_short", ("start", "end")]}
     }
 
     

@@ -97,8 +97,6 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
 
 def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
     driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
-    # if piece_object.map_number == "6"  and piece_object.id == "right_turn_short_1":
-    #     print()
     indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
     track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]

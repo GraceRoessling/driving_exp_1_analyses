@@ -55,11 +55,6 @@ def initialize_maps_and_pieces(subject):
 
         trial_object.map = map_object
         trial_object.pieces = piece_obj_dict
-        # if map_object.map_number == "6": 
-        #     print(trial_object.number)
-        #     print(map_object.pieces)
-        #     print(trial_object.pieces)
-        #     print("#-----------------------------")
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Main

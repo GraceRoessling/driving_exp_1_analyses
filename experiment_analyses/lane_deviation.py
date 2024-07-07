@@ -166,3 +166,4 @@ def get_track_piece_of_interest(subject,trial_num,master_dict,track_piece):
     traj_z = list(track_piece_df["pos_z"])
     
     return(center_x, center_z, traj_x,traj_z)
+
