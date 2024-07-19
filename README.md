@@ -5,7 +5,7 @@ There are instructions on that Jupyter Notebook about how to extract the followi
 Note: the first code block will spam a bunch of warnings. Just ignore those...
 
 For a given subject and trial (e.g. "boss" in trial "4"):
-  > What is the map number associated to this trial? (if the subject is not in the familiar group, then the map number is not 1 unless its the last trial)
+  > What is the map number associated to this trial? (if the subject is not in the familiar group, then the map number is not 1 unless its the last trial)?
 
   > What is the file path to the CSV file of this particular subject and trial?
 
