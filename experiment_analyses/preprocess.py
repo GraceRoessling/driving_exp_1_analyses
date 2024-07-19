@@ -8,7 +8,8 @@ import map
 from IPython import embed
 import dataframe_helper_functions
 import parse_path_center_csv
-
+import track_piece_correction
+import lane_deviation
 # ----------------------------------------------------------------------------------------------------------------------
 # Helper funcs
 def initialize_subjects():
@@ -53,29 +54,45 @@ def initialize_maps_and_pieces(subject):
                 piece_obj_dict[track_id] = piece_object
             piece_object.center_of_track_df = map_object.center_dict[track_id]
 
+        trial_object.number = i
         trial_object.map = map_object
         trial_object.pieces = piece_obj_dict
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Main
 
-subject_dict = initialize_subjects()
-for subject_id in subject_dict:
-    if subject_id == "wad":
-        pass
-    else:
-        subject_object = subject_dict[subject_id]
-        subject_object.speed,subject_object.steering,subject_object.lap_time = dict(),dict(),dict()
-        initialize_trials_for_one_subject(subject_object)
-        initialize_maps_and_pieces(subject_object)
 
-        for i in range(0,10):
-            total_speed_dict,track_piece_speed_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("speed",subject_object.trials[i],subject_object.trials[i].map)
-            total_steering_dict,track_piece_steering_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("steering",subject_object.trials[i],subject_object.trials[i].map)
-            entire_trial_lap_time,track_piece_time_dict = dataframe_helper_functions.get_lap_time_for_each_track_piece_for_one_trial(subject_object.trials[i],subject_object.trials[i].map)
-            subject_object.speed[i+1] = {f"trial_total":total_speed_dict,f"trial_piece":track_piece_speed_dict}
-            subject_object.steering[i+1] = {f"trial_total":total_steering_dict,f"trial_piece":track_piece_steering_dict}
-            subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
+# Initialize subjects (remove problematic wad :() )
+subject_dict = initialize_subjects()
+del subject_dict["wad"]
+
+# With subjects, create trial, map, and piece classes with the appropriate data
+for subject_id in subject_dict:
+    subject_object = subject_dict[subject_id]
+    initialize_trials_for_one_subject(subject_object)
+    initialize_maps_and_pieces(subject_object)
+
+# Apply corrections to the ten maps 
+master_dict,non_interp_dict = lane_deviation.generate_track_piece_dict(subject_dict)
+track_piece_correction.correct_position_for_entire_dataset(subject_dict,master_dict)
+
+# Attach data attributes (speed, steering, laptime, and lane deviation to objects)
+for subject_id in subject_dict:
+    subject_object = subject_dict[subject_id]
+    lane_deviation.grab_lane_deviation_data(subject_object)
+    subject_object.speed,subject_object.steering,subject_object.lap_time,subject_object.lane_dev = dict(),dict(),dict(),dict()
+    for i in range(0,10):
+        total_speed_dict,track_piece_speed_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("speed",subject_object.trials[i],subject_object.trials[i].map)
+        total_steering_dict,track_piece_steering_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("steering",subject_object.trials[i],subject_object.trials[i].map)
+        entire_trial_lap_time,track_piece_time_dict = dataframe_helper_functions.get_lap_time_for_each_track_piece_for_one_trial(subject_object.trials[i],subject_object.trials[i].map)
+        total_lane_dev_dict,track_piece_lane_dev_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("lane_dev",subject_object.trials[i],subject_object.trials[i].map)
+        subject_object.speed[i+1] = {f"trial_total":total_speed_dict,f"trial_piece":track_piece_speed_dict}
+        subject_object.steering[i+1] = {f"trial_total":total_steering_dict,f"trial_piece":track_piece_steering_dict}
+        subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
+        subject_object.lane_dev[i+1] = {f"trial_total":total_lane_dev_dict,f"trial_piece":track_piece_lane_dev_dict}
+
+    # print(subject_object.lane_dev)
+
 
 
 

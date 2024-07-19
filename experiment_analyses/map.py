@@ -47,19 +47,6 @@ class Map:
         "10":["straight_long", "right_turn_med", "right_turn_long", "right_turn_short", "left_turn_med", "u_turn_long", "left_turn_short","straight_short"]
     }
 
-    track_piece_wrap_issue = {
-        "1":{"s_turn_short"},
-        "2":{"s_turn_short"},
-        "3":{"s_turn_long"},
-        "4":{"s_turn_long"},
-        "5":{None},
-        "6":{"s_turn_long"},
-        "7":{"s_turn_long"},
-        "8":{None},  
-        "9":{None},
-        "10":{None}
-    }
-
 # list in order of correction (rather than order of pieces along track)
     track_piece_rotation_issue = {
         "1":{"straight_short" : [90, "left_turn_long", ("end","start")]},

@@ -166,6 +166,8 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
         whole_trial_df_column = whole_trial_driving_sim_df["velocity_magnitude"]
     elif metric_type_as_string == "steering":
         whole_trial_df_column = whole_trial_driving_sim_df["steering_angle"]
+    elif metric_type_as_string == "lane_dev":
+        whole_trial_df_column = trial.trial_lane_dev_df["lane_dev"]
 
     # get total trial time
     whole_trial_mean = whole_trial_df_column.mean()
@@ -175,7 +177,6 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
 
     # iterate through track pieces and get speed info for each
     all_track_pieces = map.pieces # list of pieces associated to a given map
-    if map.map_number == "6" :  print(all_track_pieces)
     for track_piece_id in all_track_pieces:
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]  
@@ -184,6 +185,9 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
             piece_df_column = driving_sim_df["velocity_magnitude"]
         elif metric_type_as_string == "steering":
             piece_df_column = driving_sim_df["steering_angle"]
+        elif metric_type_as_string == "lane_dev":
+            piece_df_column = driving_sim_df["steering_angle"]
+            piece_df_column = track_piece_object.lane_dev_df["lane_dev"]
 
         piece_mean = piece_df_column.mean()
         piece_var = piece_df_column.var()

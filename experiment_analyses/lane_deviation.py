@@ -1,15 +1,81 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-from scipy.interpolate import CubicSpline,CubicHermiteSpline,UnivariateSpline,PchipInterpolator
 from numpy import diff
 import numpy as np
-import scipy
-import preprocess
 import math
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
+import os
+import json
+import itertools
+import map
+#import tensorflow as tf
 
+# Grab lane deviation data and integrate it with every subject's dataframe ----------------------
+lane_deviation_file_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 1/data/lane_deviation_data"
+
+def sort_dataframes_for_one_trial_df(trial, dataframe_dict):
+    map_number = trial.map.map_number
+    ordinal_list_of_track_pieces = map.Map.ordinal_map_pieces_dict[map_number]
+    
+    pox_x_column = []
+    pox_z_column = []
+    lane_dev_column = []
+    
+    for track_piece in ordinal_list_of_track_pieces:
+        lane_dev_df = dataframe_dict[track_piece]
+        pox_x_column.append(list(lane_dev_df["pos_x"]))
+        pox_z_column.append(list(lane_dev_df["pos_z"]))
+        lane_dev_column.append(list(lane_dev_df["lane_dev"]))
+        
+    pox_x_column = list(itertools.chain.from_iterable(pox_x_column))
+    pox_z_column = list(itertools.chain.from_iterable(pox_z_column))
+    lane_dev_column = list(itertools.chain.from_iterable(lane_dev_column))
+    
+    trial_lane_dev_df = pd.DataFrame({"pos_x": pox_x_column, "pos_z": pox_z_column, "lane_dev": lane_dev_column}) 
+    return(trial_lane_dev_df)
+
+def grab_lane_deviation_data(subject):
+    for i in range(0,10): # iterate through ten trials and generate dataframes for lane deviation
+        trial_number = i
+        trial = subject.trials[trial_number]
+        path_to_trial_folder = lane_deviation_file_path + f"/{subject.condition}/{subject.id}/trial_{trial.number}_map_{trial.map.map_number}/"
+        #list_of_track_pieces = map.Map.ordinal_map_pieces_dict[trial.map.map_number] 
+
+        lane_dev_dict = {}
+
+        # go through the folder, get the json files with lane deviation values, and save them in a dataframe for track_piece objects
+        for filename in os.listdir(path_to_trial_folder):
+            track_piece = filename.replace('.json','')
+            # open individual track piece json
+            with open(path_to_trial_folder + filename) as f: 
+                track_piece_dict = json.load(f)
+            
+            # get the lane deviation values
+            index = list(track_piece_dict.keys()).pop()
+            lane_deviation_values = list(track_piece_dict.values()).pop()
+            
+            # get trajectory x,z values for dataframe 
+            track_piece_df = subject.trials[trial.number].pieces[track_piece].trajectory_df
+            traj_x = track_piece_df["pos_x"]
+            traj_z = track_piece_df["pos_z"]
+            
+            # create dataframe for individual track pieces (with corresponding trimmed x,y trajectories)
+            track_piece_lane_dev_df = pd.DataFrame({"pos_x": traj_x, "pos_z": traj_z, "lane_dev": lane_deviation_values})
+            trial.pieces[track_piece].lane_dev_df = track_piece_lane_dev_df
+            
+            # save into list to sew into larger dataframe
+            lane_dev_dict[track_piece] = track_piece_lane_dev_df
+            
+        # create dataframe for entire trial (with corresponding trimmed x,y trajectories)
+        trial.lane_dev_dict = lane_dev_dict
+        trial_lane_dev_df = sort_dataframes_for_one_trial_df(trial, lane_dev_dict)
+        trial.trial_lane_dev_df = trial_lane_dev_df
+
+
+# General helper functions ------------------------------------------------
 def separate_xy_values(points):
     x_values = []
     y_values = []
@@ -19,6 +85,14 @@ def separate_xy_values(points):
         y_values.append(y)
     
     return x_values, y_values
+
+def combine_lists(list1, list2):
+    combined_list = []
+    for i in range(min(len(list1), len(list2))):
+        combined_list.append((list1[i], list2[i]))
+    return combined_list
+
+# Interpolation functions ----------------------------------------------------
 
 def interpolate_line(x_values, y_values, resolution):
     interp_func = interp1d(x_values, y_values, kind='linear') 
@@ -52,6 +126,9 @@ def arc_length(x, y):
     ds = np.sqrt(dx**2 + dy**2)
     return np.cumsum(ds)
 
+
+# Make master dictionary for centerline correction ------------------------------
+
 def get_xz_for_track_piece(center_x,center_z,resolution):
     arc_lengths = arc_length(center_x, center_z)
 
@@ -65,44 +142,6 @@ def get_xz_for_track_piece(center_x,center_z,resolution):
     z_new = np.interp(interp_space, arc_lengths, center_z)
     
     return(x_new,z_new)
-
-def combine_lists(list1, list2):
-    combined_list = []
-    for i in range(min(len(list1), len(list2))):
-        combined_list.append((list1[i], list2[i]))
-    return combined_list
-
-
-def distance_to_centerline(point, centerline):
-    x, y = point
-    min_distance = float('inf')
-
-    for i in range(len(centerline)):
-        x1, y1 = centerline[i]
-
-        # Calculate the distance between the point and the segment
-        distance = math.sqrt((x - x1) ** 2 + (y - y1) ** 2)
-
-        # Update the minimum distance and closest point
-        if distance < min_distance:
-            min_distance = distance
-            closest_point = (x1, y1)
-
-    return min_distance, closest_point
-
-def get_track_piece_indices(track_piece,center_of_road_map1):
-    indices_for_track_piece = list(center_of_road_map1.index[center_of_road_map1['Road_Name'].str.contains(track_piece)])
-    track_piece_center_of_road_map1 = center_of_road_map1[center_of_road_map1['Road_Name'].str.contains(track_piece)]
-    return(indices_for_track_piece,track_piece_center_of_road_map1)
-
-def get_center_of_lane_per_track_piece(center_of_road_map1):
-    track_pieces = sorted((list(set(center_of_road_map1["Road_Name"]))))
-    dict_of_track_piece_dfs = {}
-    for i in range(0,len(track_pieces)):
-        indices_for_track_piece,track_piece_center_of_road_map1 = get_track_piece_indices(track_pieces[i],center_of_road_map1)
-        dict_of_track_piece_dfs[track_pieces[i]] = {"map_1":track_piece_center_of_road_map1}
-    return(track_pieces,dict_of_track_piece_dfs)
-
 
 def generate_track_piece_dict(subject_dict):
     interp_master_dict = {"1": {},"2": {},"3": {},"4": {},"5": {},"6": {},"7": {},"8": {},"9": {},"10": {},}
@@ -137,23 +176,6 @@ def generate_track_piece_dict(subject_dict):
             non_interp_master_dict[map.map_number][track_piece] = {"x":center_x, "z":center_z}
     return(interp_master_dict,non_interp_master_dict)
 
-def get_list_of_dataframes_for_road_center_csv(master_dict):
-    map_df_list = []
-
-    for i in range(1,11):
-        map_df = pd.DataFrame()
-        map_key = str(i)
-        map_dict = master_dict[map_key]
-        track_pieces = list(map_dict.keys())
-        for track_piece in track_pieces:
-            x = map_dict[track_piece]["x"]
-            z = map_dict[track_piece]["z"]
-            map_df[f"{track_piece}_x"] = pd.Series(x)
-            map_df[f"{track_piece}_z"] = pd.Series(z)
-        map_df_list.append(map_df)
-
-    return(map_df_list)
-
 def get_track_piece_of_interest(subject,trial_num,master_dict,track_piece):
     # get center position
     map_num = subject.trials[trial_num].map.map_number
@@ -167,3 +189,95 @@ def get_track_piece_of_interest(subject,trial_num,master_dict,track_piece):
     
     return(center_x, center_z, traj_x,traj_z)
 
+# Lane deviation calculations ---------------------------------------
+
+def distance_to_centerline(point, centerline):
+
+    x, y = point
+    min_distance = float('inf')
+
+    for i in range(len(centerline)):
+        x1, y1 = centerline[i]
+
+        # Calculate the distance between the point and the segment
+        distance = math.sqrt((x - x1) ** 2 + (y - y1) ** 2)
+
+        # Update the minimum distance and closest point
+        if distance < min_distance:
+            min_distance = distance
+            closest_point = (x1, y1)
+
+    return min_distance, closest_point
+
+def distance_to_centerline_signed_efficient(point, centerline):
+    x, y = point
+
+    # Build k-d tree from centerline points
+    tree = cKDTree(centerline)
+
+    # Find the 2 nearest neighbors
+    distances, indices = tree.query([x, y], k=2)
+
+    min_distance = float('inf')
+    closest_index = None
+
+    # Check the segment between the two nearest points and their adjacent segments
+    for i in range(min(indices[0], indices[1]) - 1, max(indices[0], indices[1]) + 1):
+        if i < 0 or i >= len(centerline) - 1:
+            continue
+
+        x1, y1 = centerline[i]
+        x2, y2 = centerline[i + 1]
+
+        # Vector from start to end of the segment
+        segment_vector = (x2 - x1, y2 - y1)
+        
+        # Vector from start of the segment to the point
+        point_vector = (x - x1, y - y1)
+        
+        # Calculate the projection of point_vector onto segment_vector
+        segment_length_squared = segment_vector[0]**2 + segment_vector[1]**2
+        projection = (point_vector[0] * segment_vector[0] + point_vector[1] * segment_vector[1]) / segment_length_squared
+        
+        # Find the closest point on the segment
+        if projection <= 0:
+            closest = (x1, y1)
+            segment_closest_index = i
+        elif projection >= 1:
+            closest = (x2, y2)
+            segment_closest_index = i + 1
+        else:
+            closest = (x1 + projection * segment_vector[0], y1 + projection * segment_vector[1])
+            # Choose the nearer of the two segment endpoints
+            segment_closest_index = i if projection < 0.5 else i + 1
+        
+        # Calculate the distance between the point and the closest point on the segment
+        distance = math.sqrt((x - closest[0])**2 + (y - closest[1])**2)
+        
+        # Update the minimum distance and closest index
+        if distance < min_distance:
+            min_distance = distance
+            closest_index = segment_closest_index
+
+    # Determine the side of the centerline
+    if closest_index is not None:
+        if closest_index > 0:
+            segment_start = centerline[closest_index - 1]
+            segment_end = centerline[closest_index]
+        else:
+            segment_start = centerline[closest_index]
+            segment_end = centerline[closest_index + 1]
+        
+        segment_vector = (segment_end[0] - segment_start[0], 
+                          segment_end[1] - segment_start[1])
+        point_vector = (point[0] - segment_start[0], 
+                        point[1] - segment_start[1])
+        
+        # Calculate the cross product
+        cross_product = segment_vector[0] * point_vector[1] - segment_vector[1] * point_vector[0]
+        
+        # Adjust the sign of the distance based on the cross product
+        if cross_product > 0:
+            min_distance = -min_distance  # Point is on the left side
+
+    return min_distance, closest_index

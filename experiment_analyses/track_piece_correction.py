@@ -133,52 +133,39 @@ def trim_trajectory_line(trajectory,centerline):
                     final_trimmed_traj = reverese_trimmed_traj[::-1]
                     # trim_x, trim_z = lane_deviation.separate_xy_values(final_trimmed_traj)
                     return(final_trimmed_traj)
-        elif count == 20 and check(start_collect_closest_points) == True:
+        elif count == 50 and check(start_collect_closest_points) == True:
             return(None)
     
     # All the above to visualize ---------------------------
 
-def save_corrected_lines(subject, trial_number, master_dict,track_piece,center_x,center_z,traj_x,traj_z):
+def save_corrected_lines(subject, trial_number, master_dict,track_piece,center_x,center_z):
     # save newly corrected center points and trimmed trajectory
     map_num = subject.trials[trial_number].map.map_number
     master_dict[str(map_num)][track_piece]['x'] = center_x
     master_dict[str(map_num)][track_piece]['z'] = center_z
-    
-    # #save newly trimmed track piece
-    # track_piece_df = subject.trials[trial_number].pieces[track_piece].trajectory_df
-    # track_piece_df["pos_x"] = pd.Series(traj_x)
-    # track_piece_df["pos_z"] = pd.Series(traj_z)
+
+def save_trimmed_trajectory(subject, trial_number,track_piece,traj_x,traj_z, center_x, center_z):
+    trajectory,centerline = lane_deviation.combine_lists(traj_x,traj_z),lane_deviation.combine_lists(center_x, center_z)
+    trajectory = trim_trajectory_line(trajectory,centerline)
+   
+    # save newly corrected center points and trimmed trajectory
+    traj_x, traj_z = lane_deviation.separate_xy_values(trajectory)
+    track_piece_df = subject.trials[trial_number].pieces[track_piece].trajectory_df
+    track_piece_df["pos_x"] = pd.Series(traj_x)
+    track_piece_df["pos_z"] = pd.Series(traj_z)
+
+    return(trajectory,centerline)
 
 
 def correct_and_plot(angle, subject, trial_number, master_dict,track_piece,connector_piece,connector_1,connector_2):
-
     # if rotation correction is necessary
     if angle == 90:
         connector_center_x,connector_center_z,center,trajectory= execute_rotation_and_translation(subject, trial_number, master_dict,track_piece,connector_piece,connector_1,connector_2)  
-
+    # if rotation is not necessary
     elif angle == 0:
         connector_center_x,connector_center_z,center,trajectory = execute_translation_only(subject, trial_number, master_dict,track_piece, connector_piece,connector_1,connector_2)
-    # # trim trajectory for lane deviation analysis
-    # trajectory = trim_trajectory_line(trajectory,center)
     traj_x,traj_z = lane_deviation.separate_xy_values(trajectory)
     center_x,center_z = lane_deviation.separate_xy_values(center)
-
-    # # get closest point
-    # min_distance, closest_point = lane_deviation.distance_to_centerline(trajectory[lane_dev_idx], center) # get lane deviation
-    
-    #plot
-    # fig1, ax1 = plt.subplots()
-
-    # plot lines for reference
-    # ax1.plot(connector_center_x, connector_center_z, c="green") # connector track piece
-    # ax1.plot(center_x, center_z, c="blue") # rotated and translated center piece
-    # ax1.plot(traj_x,traj_z, c="purple") # trimmed trajectory
-
-    # plot points for reference
-    # ax1.plot(trajectory[lane_dev_idx][0], trajectory[lane_dev_idx][1], 'o', markersize=5, c="purple")
-    # ax1.plot(closest_point[0], closest_point[1], 'o', markersize = 5, c = "green")
-    # plt.show()
-    
     return(center_x,center_z,traj_x,traj_z)
 
 def correct_position_for_entire_dataset(subject_dict,master_dict):
@@ -206,7 +193,7 @@ def correct_position_for_entire_dataset(subject_dict,master_dict):
             
             # execute track correction
             center_x,center_z,traj_x,traj_z = correct_and_plot(angle,subject,trial_number,master_dict,track_piece,connector_track,connector_tuple[0],connector_tuple[1])
-            save_corrected_lines(subject, trial_number, master_dict,track_piece,center_x,center_z,traj_x,traj_z)
+            save_corrected_lines(subject, trial_number, master_dict,track_piece,center_x,center_z)
     
             #plot
             # fig1, ax1 = plt.subplots()
