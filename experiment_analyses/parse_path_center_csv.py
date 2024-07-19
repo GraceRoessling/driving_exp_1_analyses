@@ -1,10 +1,8 @@
 import pandas as pd
 import os
 
-directory = r"C:\Users\graci\Dropbox\PAndA\Thesis Experiment 1\data\track_piece_center"
-
-def get_map_csv_files(map_string):
-    map_specific_dir = directory + f"\{map_string}"
+def get_map_csv_files(map_string, dir_path):
+    map_specific_dir = dir_path + f"\{map_string}"
     list_of_track_pieces = []
     dict_of_center_csvs = {}
     for filename in os.listdir(map_specific_dir):
@@ -26,9 +24,9 @@ def preprocess_dataframes(dict_of_center_csvs,list_of_track_pieces):
         track_piece_dict[track_piece] = track_piece_df
     return(track_piece_dict)
     
-def add_dicts_to_map_object(map_num):
+def add_dicts_to_map_object(map_num, dir_path):
     map_name = 'Map_' + map_num
-    dict_of_center_csvs,list_of_track_pieces = get_map_csv_files(map_name)
+    dict_of_center_csvs,list_of_track_pieces = get_map_csv_files(map_name, dir_path)
     track_piece_dict = preprocess_dataframes(dict_of_center_csvs,list_of_track_pieces)
     return(track_piece_dict)
 

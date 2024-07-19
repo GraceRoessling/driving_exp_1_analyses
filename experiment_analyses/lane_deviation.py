@@ -14,7 +14,7 @@ import map
 #import tensorflow as tf
 
 # Grab lane deviation data and integrate it with every subject's dataframe ----------------------
-lane_deviation_file_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 1/data/lane_deviation_data"
+
 
 def sort_dataframes_for_one_trial_df(trial, dataframe_dict):
     map_number = trial.map.map_number
@@ -37,7 +37,7 @@ def sort_dataframes_for_one_trial_df(trial, dataframe_dict):
     trial_lane_dev_df = pd.DataFrame({"pos_x": pox_x_column, "pos_z": pox_z_column, "lane_dev": lane_dev_column}) 
     return(trial_lane_dev_df)
 
-def grab_lane_deviation_data(subject):
+def grab_lane_deviation_data(subject, lane_deviation_file_path):
     for i in range(0,10): # iterate through ten trials and generate dataframes for lane deviation
         trial_number = i
         trial = subject.trials[trial_number]
