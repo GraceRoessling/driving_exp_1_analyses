@@ -53,19 +53,30 @@ def grab_lane_deviation_data(subject, lane_deviation_file_path):
             with open(path_to_trial_folder + filename) as f: 
                 track_piece_dict = json.load(f)
             
-            # get the lane deviation values
-            index = list(track_piece_dict.keys()).pop()
-            lane_deviation_values = list(track_piece_dict.values()).pop()
-            
             # get trajectory x,z values for dataframe 
             track_piece_df = subject.trials[trial.number].pieces[track_piece].trajectory_df
             traj_x = track_piece_df["pos_x"]
             traj_z = track_piece_df["pos_z"]
             
+            # get the lane deviation values and shorten the list so that it matches the length of the trajectory
+            lane_deviation_values = list(track_piece_dict.values())
+            traj_length, ld_length = len(traj_x), len(lane_deviation_values)
+            diff_in_length = traj_length - ld_length
+            # lane_deviation_values = lane_deviation_values[:-diff_in_length]
+
+            
+            
+            # get trajectory x,z values for dataframe 
+            track_piece_df = subject.trials[trial.number].pieces[track_piece].trajectory_df
+            traj_x = track_piece_df["pos_x"].tolist()[:-diff_in_length]
+            traj_z = track_piece_df["pos_z"].tolist()[:-diff_in_length]
+            
+            # from IPython import embed;embed()
             # create dataframe for individual track pieces (with corresponding trimmed x,y trajectories)
             track_piece_lane_dev_df = pd.DataFrame({"pos_x": traj_x, "pos_z": traj_z, "lane_dev": lane_deviation_values})
             trial.pieces[track_piece].lane_dev_df = track_piece_lane_dev_df
-            
+            #print(track_piece_lane_dev_df)
+
             # save into list to sew into larger dataframe
             lane_dev_dict[track_piece] = track_piece_lane_dev_df
             

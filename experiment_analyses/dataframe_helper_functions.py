@@ -2,7 +2,9 @@ import pandas as pd
 import piece
 import math
 import IPython
+import numpy as np
 from collections import defaultdict
+import steering_acceleration_analysis
 
 # filter dataframes --------------------------------------------------------------------------
 def check_repeating_sequences(df):
@@ -168,6 +170,8 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
         whole_trial_df_column = whole_trial_driving_sim_df["steering_angle"]
     elif metric_type_as_string == "lane_dev":
         whole_trial_df_column = trial.trial_lane_dev_df["lane_dev"]
+        whole_trial_df_column = whole_trial_df_column.replace([np.inf, -np.inf], 0)
+        whole_trial_df_column = whole_trial_df_column.abs()
 
     # get total trial time
     whole_trial_mean = whole_trial_df_column.mean()
@@ -186,9 +190,9 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
         elif metric_type_as_string == "steering":
             piece_df_column = driving_sim_df["steering_angle"]
         elif metric_type_as_string == "lane_dev":
-            piece_df_column = driving_sim_df["steering_angle"]
             piece_df_column = track_piece_object.lane_dev_df["lane_dev"]
-
+            piece_df_column = piece_df_column.replace([np.inf, -np.inf], 0)
+            piece_df_column = piece_df_column.abs()
         piece_mean = piece_df_column.mean()
         piece_var = piece_df_column.var()
         piece_sd = piece_df_column.std()
@@ -197,17 +201,21 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
     return(total_var_dict,track_piece_dict)
 
 
-# steering variance
-def get_lap_time_for_each_track_piece_for_one_trial(trial,map):
+def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_as_string,trial,map):
+    # collect speed information in this dictionary
+    track_piece_dict = dict()
+
     # get total trial time
     whole_trial_driving_sim_df = trial.paths["Vehicle_DrivingSim"]
-    entire_trial_first_time_step = whole_trial_driving_sim_df["time"].iloc[0]
-    entire_trial_last_time_step = whole_trial_driving_sim_df["time"].iloc[-1]
-    entire_trial_lap_time = entire_trial_last_time_step - entire_trial_first_time_step
-    
-    # collect speed information in this dictionary
-    track_piece_lap_time_dict = dict()
 
+    if metric_type_as_string == "lap_time":
+        entire_trial_first_time_step = whole_trial_driving_sim_df["time"].iloc[0]
+        entire_trial_last_time_step = whole_trial_driving_sim_df["time"].iloc[-1]
+        entire_trial = entire_trial_last_time_step - entire_trial_first_time_step
+
+    elif metric_type_as_string == "steering_acc":
+        steering_accelerations = steering_acceleration_analysis.calculate_average_steering_acceleration(whole_trial_driving_sim_df)
+        entire_trial = np.mean(steering_accelerations)
     # collapse the dictionary into a list
     all_track_pieces = map.pieces # list of pieces associated to a given map
 
@@ -215,13 +223,18 @@ def get_lap_time_for_each_track_piece_for_one_trial(trial,map):
     for track_piece_id in all_track_pieces:
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]
-                
-        first_time_step = driving_sim_df["time"].iloc[0]
-        last_time_step = driving_sim_df["time"].iloc[-1]
-        total_lap_time = last_time_step - first_time_step
-                
-        track_piece_lap_time_dict[track_piece_id] = {"lap_time":total_lap_time}
-    return(entire_trial_lap_time,track_piece_lap_time_dict)
+        
+        if metric_type_as_string == "lap_time":
+            first_time_step = driving_sim_df["time"].iloc[0]
+            last_time_step = driving_sim_df["time"].iloc[-1]
+            total_lap_time = last_time_step - first_time_step
+            track_piece_dict[track_piece_id] = {"lap_time":total_lap_time}
+        
+        elif metric_type_as_string == "steering_acc":
+            piece_steering_accelerations = steering_acceleration_analysis.calculate_average_steering_acceleration(driving_sim_df)
+            piece_steering_acc = np.mean(piece_steering_accelerations)
+            track_piece_dict[track_piece_id] = {"steering_acceleration":piece_steering_acc}
+    return(entire_trial,track_piece_dict)
 
 def get_unique_consecutive_strings(string_list):
     unique_strings = []

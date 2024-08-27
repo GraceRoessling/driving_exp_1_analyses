@@ -7,3 +7,5 @@ LANE_DEVIATION_PATH = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 1/data/lan
 warnings.filterwarnings("ignore")
 subject_dict,master_dict,non_interp_dict = preprocess.run(SUBJECT_PATH, TRACK_CENTER_PATH, LANE_DEVIATION_PATH)
 
+# subject_dict,master_dict,non_interp_dict = preprocess.run_one_subject(SUBJECT_PATH, TRACK_CENTER_PATH, LANE_DEVIATION_PATH)
+
