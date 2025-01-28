@@ -172,7 +172,7 @@ def generate_track_piece_dict(subject_dict):
             track_piece_df = subject_dict[subject.id].trials[trial_num].map.center_dict[track_piece]
             center_x = track_piece_df["x"].to_numpy().astype(float)
             center_z = track_piece_df["z"].to_numpy().astype(float)
-            
+            x_new,z_new = [],[]
             if "straight" not in track_piece:
                 length = curve_length(center_x, center_z)
                 resolution = int(length * 1000)
@@ -217,8 +217,9 @@ def distance_to_centerline(point, centerline):
         if distance < min_distance:
             min_distance = distance
             closest_point = (x1, y1)
-
-    return min_distance, closest_point
+            return min_distance, closest_point
+        else:
+            print("distance is greater than min_distance")
 
 def distance_to_centerline_signed_efficient(point, centerline):
     x, y = point

@@ -1,15 +1,15 @@
 # Analysis 3: sd Steering ----------------------------------------------------------------
 # Create plot of data showing two-way interaction
 # relevant columns
-total_sd_steering_high_vis_familiar = mean(famliar_df[["high_vis_sd_steering_10"]])
+total_sd_steering_high_vis_familiar = mean(familiar_df[["high_vis_sd_steering_10"]])
 total_sd_steering_high_vis_unfamiliar = mean(unfamiliar_df[["high_vis_sd_steering_10"]])
-total_sd_steering_low_vis_familiar = mean(famliar_df[["low_vis_sd_steering_10"]])
+total_sd_steering_low_vis_familiar = mean(familiar_df[["low_vis_sd_steering_10"]])
 total_sd_steering_low_vis_unfamiliar = mean(unfamiliar_df[["low_vis_sd_steering_10"]])
 
 # Calculate standard error for error bars
-SE_total_sd_steering_high_vis_familiar = sd(famliar_df[["high_vis_sd_steering_10"]])/sqrt(length((famliar_df[["high_vis_sd_steering_10"]])))
+SE_total_sd_steering_high_vis_familiar = sd(familiar_df[["high_vis_sd_steering_10"]])/sqrt(length((familiar_df[["high_vis_sd_steering_10"]])))
 SE_total_sd_steering_high_vis_unfamiliar = sd(unfamiliar_df[["high_vis_sd_steering_10"]])/sqrt(length((unfamiliar_df[["high_vis_sd_steering_10"]])))
-SE_total_sd_steering_low_vis_familiar = sd(famliar_df[["low_vis_sd_steering_10"]])/sqrt(length((famliar_df[["low_vis_sd_steering_10"]])))
+SE_total_sd_steering_low_vis_familiar = sd(familiar_df[["low_vis_sd_steering_10"]])/sqrt(length((familiar_df[["low_vis_sd_steering_10"]])))
 SE_total_sd_steering_low_vis_unfamiliar = sd(unfamiliar_df[["low_vis_sd_steering_10"]])/sqrt(length((unfamiliar_df[["low_vis_sd_steering_10"]])))
 
 sd_steering_plot_df <- data.frame(stringsAsFactors=TRUE,visibility=c("Low_visibility","Low_visibility","High_visibility","High_visibility"), 
