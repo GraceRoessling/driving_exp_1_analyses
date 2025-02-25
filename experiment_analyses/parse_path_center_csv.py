@@ -12,7 +12,11 @@ def get_map_csv_files(map_string, dir_path):
         dict_of_center_csvs[track_name] = center_of_road
         list_of_track_pieces.append(track_name)
     return(dict_of_center_csvs,list_of_track_pieces)
-    
+
+
+# This function takes in a dictionary of center of road csv files and a list of track pieces, and 
+# returns a dictionary of dataframes, 
+# where the keys are the track pieces and the values are the dataframes
 def preprocess_dataframes(dict_of_center_csvs,list_of_track_pieces):
     track_piece_dict = {}
     for track_piece in list_of_track_pieces:
@@ -24,6 +28,8 @@ def preprocess_dataframes(dict_of_center_csvs,list_of_track_pieces):
         track_piece_dict[track_piece] = track_piece_df
     return(track_piece_dict)
     
+# This function takes in a map number and a directory path, and returns a dictionary of dataframes, 
+# where the keys are the track pieces and the values are the dataframes
 def add_dicts_to_map_object(map_num, dir_path):
     map_name = 'Map_' + map_num
     dict_of_center_csvs,list_of_track_pieces = get_map_csv_files(map_name, dir_path)

@@ -1,39 +1,42 @@
 import pandas as pd
 import piece
 import math
+import re
 import IPython
 import numpy as np
 from collections import defaultdict
 import steering_acceleration_analysis
 
 # filter dataframes --------------------------------------------------------------------------
-def check_repeating_sequences(df):
+
+def extract_map_number(filename):
+    match = re.search(r'(?i)map_(\d+)', filename)
+    if match:
+        return int(match.group(1))
+    return None  # Return None if no match is found
+
+def clean_track_data(df):
     # Convert the column to a list for easier manipulation
     col_list = df["current_track_piece"].tolist()
     
-    # Dictionary to store the count of sequences for each unique value
-    sequence_counts = {}
+    # Find all indices where 'RESET' appears
+    reset_indices = [i for i, x in enumerate(col_list) if x == 'RESET']
     
-    current_value = None
-    sequence_started = False
+    if not reset_indices:
+        return col_list
     
-    for value in col_list:
-        if value != current_value:
-            # New value encountered
-            if sequence_started:
-                sequence_counts[current_value] = sequence_counts.get(current_value, 0) + 1
-            current_value = value
-            sequence_started = True
-        elif not sequence_started:
-            # Continuing a sequence
-            sequence_started = True
+    # Find values that appear before each RESET cluster
+    values_to_remove = set()
+    for reset_idx in reset_indices:
+        # Make sure we don't go below index 0
+        if reset_idx > 0:
+            values_to_remove.add(data[reset_idx - 1])
     
-    # Check the last sequence
-    if sequence_started:
-        sequence_counts[current_value] = sequence_counts.get(current_value, 0) + 1
+    # Remove RESET strings and all identified preceding values
+    mask = ~series.isin(['RESET'] + list(values_to_remove))
+    cleaned_series = series[mask]
     
-    # Check if any value has more than one sequence
-    return any(count > 1 for count in sequence_counts.values())
+    return cleaned_series.tolist()
 
 def modify_duplicate_sequences(df):
     # Convert the column to a list for easier manipulation
@@ -57,20 +60,54 @@ def modify_duplicate_sequences(df):
             except ValueError:
                 break
         
-        # If there are at least two sequences of the same value
-        if len(sequences) >= 2:
-            # Modify the first sequence
-            for i in range(sequences[0][0], sequences[0][1]):
-                col_list[i] = f"{col_list[i]}_1"
-            
-            # Modify the second sequence
-            for i in range(sequences[1][0], sequences[1][1]):
-                col_list[i] = f"{col_list[i]}_2"
+        # Modify sequences up to 8 occurrences
+        for idx, (seq_start, seq_end) in enumerate(sequences[:8]):
+            suffix = f"_{idx + 1}"
+            for i in range(seq_start, seq_end):
+                col_list[i] = f"{value}{suffix}"
     
     # Update the DataFrame column with the modified list
     df["current_track_piece"] = col_list
     
     return df
+
+
+# def modify_duplicate_sequences(df):
+#     # Convert the column to a list for easier manipulation
+#     col_list = df["current_track_piece"].tolist()
+    
+#     # Find all unique values in the column
+#     unique_values = set(col_list)
+    
+#     for value in unique_values:
+#         # Find all occurrences of sequences of the value
+#         sequences = []
+#         start = 0
+#         while start < len(col_list):
+#             try:
+#                 start = col_list.index(value, start)
+#                 end = start
+#                 while end < len(col_list) and col_list[end] == value:
+#                     end += 1
+#                 sequences.append((start, end))
+#                 start = end
+#             except ValueError:
+#                 break
+        
+#         # If there are at least two sequences of the same value
+#         if len(sequences) >= 2:
+#             # Modify the first sequence
+#             for i in range(sequences[0][0], sequences[0][1]):
+#                 col_list[i] = f"{col_list[i]}_1"
+            
+#             # Modify the second sequence
+#             for i in range(sequences[1][0], sequences[1][1]):
+#                 col_list[i] = f"{col_list[i]}_2"
+    
+#     # Update the DataFrame column with the modified list
+#     df["current_track_piece"] = col_list
+    
+#     return df
 
 def find_ranges(lst, target):
     result = []
@@ -98,7 +135,9 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
     return(cam_position_df,vehicle_position_df,driving_vars_df)
 
 def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
-    driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
+    #driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
+    print(piece_object.id)
+    print(driving_vars_df['current_track_piece'].str.contains(piece_object.id))
     indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
     track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]

@@ -5,13 +5,13 @@ import dataframe_helper_functions
 class Trial:
     "This is the trial class. A trial is the smallest event in an experiment that consists of the subject driving along a single track."
 
-    trial_str_list = ["T001","T002","T003","T004","T005","T006","T007","T008","T009","T010"]
+    trial_str_list = ["T001","T002","T003","T004","T005","T006","T007","T008","T009","T010","T011"]
 
     def __init__(self, id, number, subject):
         self.id = id
         self.number = number
         self.subject_id = subject.id
-        self.paths = self.get_trial_paths(subject)
+        self.paths, self.driving_sim_filename = self.get_trial_paths(subject)
 
     def get_trial_paths(self,subject):
         path_to_csv = f"{subject.path}/S001/trackers"
@@ -24,14 +24,15 @@ class Trial:
                     vehicle_path = f"{path_to_csv}/{filename}"
                     vehicle_df = pd.read_csv (vehicle_path)
                 elif "Vehicle_DrivingSim":
+                    driving_sim_filename = filename
                     driving_sim_path = f"{path_to_csv}/{filename}"
                     driving_sim_df = pd.read_csv (driving_sim_path)
         main_cam_df,vehicle_df,driving_sim_df = dataframe_helper_functions.remove_NA(main_cam_df,vehicle_df,driving_sim_df)
         driving_sim_df = dataframe_helper_functions.convert_steering_value(driving_sim_df)
         paths = {"main_camera":main_cam_df,
                 "vehicle_movement":vehicle_df,
-                "Vehicle_DrivingSim":driving_sim_df}
-        return(paths)
+                "Vehicle_DrivingSim":driving_sim_df} 
+        return(paths,driving_sim_filename)
 
 
 
