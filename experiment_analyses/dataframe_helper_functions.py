@@ -16,31 +16,52 @@ def extract_map_number(filename):
     return None  # Return None if no match is found
 
 def clean_track_data(df):
+    if "RESET" not in df["current_track_piece"].values:
+        return df  # No RESET, return original dataframe
 
-    if "RESET" in df["current_track_piece"].values:
-        # Identify indices where "RESET" appears in the "current_track_piece" column
-        reset_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
+    indices_to_remove = set()
+    reset_clusters = []  # To store separate clusters of "RESET"
 
-        # Find clusters of "RESET" and remove the preceding cluster
-        indices_to_remove = set()
+    # Identify contiguous clusters of "RESET"
+    reset_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
+    
+    if not reset_indices:
+        return df  # No RESET occurrences, return original dataframe
 
-        for idx in reset_indices:
-            # Identify the cluster preceding "RESET"
-            if idx > 0:
-                prev_track_piece = df.loc[idx - 1, "current_track_piece"]
-                prev_cluster_indices = df.index[df["current_track_piece"] == prev_track_piece].tolist()
-                
-                # Ensure we only remove the cluster if it's directly preceding "RESET"
-                if prev_cluster_indices and prev_cluster_indices[-1] == idx - 1:
-                    indices_to_remove.update(prev_cluster_indices)
-            
-            # Remove the "RESET" cluster itself
-            reset_cluster_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
-            indices_to_remove.update(reset_cluster_indices)
+    reset_counts = {}  # Dictionary to track preceding track names and RESET counts
+    # Group contiguous RESET indices into clusters
+    cluster = [reset_indices[0]]
+    for i in range(1, len(reset_indices)):
+        if reset_indices[i] == reset_indices[i - 1] + 1:
+            cluster.append(reset_indices[i])
+        else:
+            reset_clusters.append(cluster)
+            cluster = [reset_indices[i]]
+    reset_clusters.append(cluster)  # Append last cluster
 
-        # Create a new dataframe without the identified clusters
-        df = df.drop(indices_to_remove).reset_index(drop=True)
-    return df
+    # Process each RESET cluster independently
+    for cluster in reset_clusters:
+        first_reset_idx = cluster[0]  # Start index of the RESET cluster
+        
+        # Identify the preceding cluster
+        if first_reset_idx > 0:
+            prev_track_piece = df.loc[first_reset_idx - 1, "current_track_piece"]
+            prev_cluster_indices = df.index[df["current_track_piece"] == prev_track_piece].tolist()
+            reset_counts[prev_track_piece] = 1
+
+            # Remove only if the previous cluster ends right before RESET
+            if prev_cluster_indices and prev_cluster_indices[-1] == first_reset_idx - 1:
+                indices_to_remove.update(prev_cluster_indices)
+
+        # Remove the RESET cluster itself
+        indices_to_remove.update(cluster)
+
+    # Create a new dataframe without the identified clusters
+    df = df.drop(indices_to_remove).reset_index(drop=True)
+    print("*********************************************")
+    print(reset_counts)
+
+    return df, reset_counts
 
 def modify_duplicate_sequences(df):
 # Identify clusters of "short_straight"
