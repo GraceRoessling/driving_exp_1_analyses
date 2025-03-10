@@ -17,7 +17,7 @@ def extract_map_number(filename):
 
 def clean_track_data(df):
     if "RESET" not in df["current_track_piece"].values:
-        return df  # No RESET, return original dataframe
+        return df, {}  # No RESET, return original dataframe
 
     indices_to_remove = set()
     reset_clusters = []  # To store separate clusters of "RESET"
@@ -26,7 +26,7 @@ def clean_track_data(df):
     reset_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
     
     if not reset_indices:
-        return df  # No RESET occurrences, return original dataframe
+        return df, {}  # No RESET occurrences, return original dataframe
 
     reset_counts = {}  # Dictionary to track preceding track names and RESET counts
     # Group contiguous RESET indices into clusters
@@ -58,8 +58,6 @@ def clean_track_data(df):
 
     # Create a new dataframe without the identified clusters
     df = df.drop(indices_to_remove).reset_index(drop=True)
-    print("*********************************************")
-    print(reset_counts)
 
     return df, reset_counts
 
@@ -107,14 +105,9 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
     return(cam_position_df,vehicle_position_df,driving_vars_df)
 
 def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
-    #driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
-    print(piece_object.id)
-    #print(driving_vars_df['current_track_piece'].str.contains(piece_object.id))
     indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
     track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
-    #print(track_piece_driving_var)
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
-    print(first_index,last_index)
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
     return(track_piece_cam_pos,track_piece_vehicle_pos,track_piece_driving_var)
@@ -182,8 +175,8 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
     elif metric_type_as_string == "steering":
         whole_trial_df_column = whole_trial_driving_sim_df["steering_angle"]
     elif metric_type_as_string == "lane_dev":
-        whole_trial_df_column = trial.trial_lane_dev_df["lane_dev"]
-        whole_trial_df_column = whole_trial_df_column.replace([np.inf, -np.inf], 0)
+        whole_trial_df_column = whole_trial_driving_sim_df["lane_deviation"]
+        #whole_trial_df_column = whole_trial_df_column.replace([np.inf, -np.inf], 0)
         whole_trial_df_column = whole_trial_df_column.abs()
 
     # get total trial time
@@ -203,8 +196,8 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
         elif metric_type_as_string == "steering":
             piece_df_column = driving_sim_df["steering_angle"]
         elif metric_type_as_string == "lane_dev":
-            piece_df_column = track_piece_object.lane_dev_df["lane_dev"]
-            piece_df_column = piece_df_column.replace([np.inf, -np.inf], 0)
+            piece_df_column =  driving_sim_df["lane_deviation"]
+            #piece_df_column = piece_df_column.replace([np.inf, -np.inf], 0)
             piece_df_column = piece_df_column.abs()
         piece_mean = piece_df_column.mean()
         piece_var = piece_df_column.var()
