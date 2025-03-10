@@ -16,98 +16,49 @@ def extract_map_number(filename):
     return None  # Return None if no match is found
 
 def clean_track_data(df):
-    # Convert the column to a list for easier manipulation
-    col_list = df["current_track_piece"].tolist()
-    
-    # Find all indices where 'RESET' appears
-    reset_indices = [i for i, x in enumerate(col_list) if x == 'RESET']
-    
-    if not reset_indices:
-        return col_list
-    
-    # Find values that appear before each RESET cluster
-    values_to_remove = set()
-    for reset_idx in reset_indices:
-        # Make sure we don't go below index 0
-        if reset_idx > 0:
-            values_to_remove.add(data[reset_idx - 1])
-    
-    # Remove RESET strings and all identified preceding values
-    mask = ~series.isin(['RESET'] + list(values_to_remove))
-    cleaned_series = series[mask]
-    
-    return cleaned_series.tolist()
 
-def modify_duplicate_sequences(df):
-    # Convert the column to a list for easier manipulation
-    col_list = df["current_track_piece"].tolist()
-    
-    # Find all unique values in the column
-    unique_values = set(col_list)
-    
-    for value in unique_values:
-        # Find all occurrences of sequences of the value
-        sequences = []
-        start = 0
-        while start < len(col_list):
-            try:
-                start = col_list.index(value, start)
-                end = start
-                while end < len(col_list) and col_list[end] == value:
-                    end += 1
-                sequences.append((start, end))
-                start = end
-            except ValueError:
-                break
-        
-        # Modify sequences up to 8 occurrences
-        for idx, (seq_start, seq_end) in enumerate(sequences[:8]):
-            suffix = f"_{idx + 1}"
-            for i in range(seq_start, seq_end):
-                col_list[i] = f"{value}{suffix}"
-    
-    # Update the DataFrame column with the modified list
-    df["current_track_piece"] = col_list
-    
+    if "RESET" in df["current_track_piece"].values:
+        # Identify indices where "RESET" appears in the "current_track_piece" column
+        reset_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
+
+        # Find clusters of "RESET" and remove the preceding cluster
+        indices_to_remove = set()
+
+        for idx in reset_indices:
+            # Identify the cluster preceding "RESET"
+            if idx > 0:
+                prev_track_piece = df.loc[idx - 1, "current_track_piece"]
+                prev_cluster_indices = df.index[df["current_track_piece"] == prev_track_piece].tolist()
+                
+                # Ensure we only remove the cluster if it's directly preceding "RESET"
+                if prev_cluster_indices and prev_cluster_indices[-1] == idx - 1:
+                    indices_to_remove.update(prev_cluster_indices)
+            
+            # Remove the "RESET" cluster itself
+            reset_cluster_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
+            indices_to_remove.update(reset_cluster_indices)
+
+        # Create a new dataframe without the identified clusters
+        df = df.drop(indices_to_remove).reset_index(drop=True)
     return df
 
+def modify_duplicate_sequences(df):
+# Identify clusters of "short_straight"
+    cluster_count = 0
+    prev_value = None
+    new_labels = []
 
-# def modify_duplicate_sequences(df):
-#     # Convert the column to a list for easier manipulation
-#     col_list = df["current_track_piece"].tolist()
-    
-#     # Find all unique values in the column
-#     unique_values = set(col_list)
-    
-#     for value in unique_values:
-#         # Find all occurrences of sequences of the value
-#         sequences = []
-#         start = 0
-#         while start < len(col_list):
-#             try:
-#                 start = col_list.index(value, start)
-#                 end = start
-#                 while end < len(col_list) and col_list[end] == value:
-#                     end += 1
-#                 sequences.append((start, end))
-#                 start = end
-#             except ValueError:
-#                 break
-        
-#         # If there are at least two sequences of the same value
-#         if len(sequences) >= 2:
-#             # Modify the first sequence
-#             for i in range(sequences[0][0], sequences[0][1]):
-#                 col_list[i] = f"{col_list[i]}_1"
-            
-#             # Modify the second sequence
-#             for i in range(sequences[1][0], sequences[1][1]):
-#                 col_list[i] = f"{col_list[i]}_2"
-    
-#     # Update the DataFrame column with the modified list
-#     df["current_track_piece"] = col_list
-    
-#     return df
+    for track_piece in df["current_track_piece"]:
+        if track_piece == "short_straight":
+            if prev_value != "short_straight":
+                cluster_count += 1  # Start a new cluster
+            new_labels.append(f"short_straight_{cluster_count}")
+        else:
+            new_labels.append(track_piece)
+        prev_value = track_piece
+    df["current_track_piece"] = new_labels
+    return df
+
 
 def find_ranges(lst, target):
     result = []
@@ -137,10 +88,12 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
 def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
     #driving_vars_df['current_track_piece'] = remove_substring(driving_vars_df['current_track_piece'], "_collider")
     print(piece_object.id)
-    print(driving_vars_df['current_track_piece'].str.contains(piece_object.id))
+    #print(driving_vars_df['current_track_piece'].str.contains(piece_object.id))
     indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
     track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
+    #print(track_piece_driving_var)
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
+    print(first_index,last_index)
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
     return(track_piece_cam_pos,track_piece_vehicle_pos,track_piece_driving_var)

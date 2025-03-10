@@ -34,13 +34,13 @@ def initialize_trials_for_one_subject(subject):
 # No need to modify this function to remove lane deviation calculations -- it simply stores the center of the track pieces
 def initialize_maps_and_pieces(subject):
     for i in range(0,11): # iterate through 11 trials
+        print(i)
         piece_obj_dict = dict() # nested dictionary that contains all values associated to each piece
         # iterate through track pieces for a given subject
         trial_object = subject.trials[i]
         map_object = map.Map(subject,trial_object)
 
         for track_id in map_object.pieces:
-            print(track_id)
             piece_object = piece.Piece(track_id,subject,trial_object,map_object)
             piece_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_piece(piece_object)
 
@@ -54,10 +54,10 @@ def initialize_maps_and_pieces(subject):
 def test_run(SUBJECT_PATH):
     subject_dict = initialize_subjects(SUBJECT_PATH)
     for subject_id in subject_dict:
+        print(subject_id)
         subject_object = subject_dict[subject_id]
         initialize_trials_for_one_subject(subject_object)
         initialize_maps_and_pieces(subject_object)
-        print(subject_object.trials[0].pieces[0].number)
 
 # def run(SUBJECT_PATH, LANE_DEVIATION_PATH):
 #     subject_dict = initialize_subjects(SUBJECT_PATH)
