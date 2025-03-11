@@ -9,13 +9,7 @@ library(patchwork)
 library(effectsize)
 
 # To compare between both visibility conditions without straight pieces
-#csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 1\\data\\main_data\\test.csv"
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 1\\data\\main_data\\main_analysis_df6.csv"
-
-# To compare between left and right turn short pieces
-# csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 1\\data\\main_data\\short_turn_piece_variable_df.csv"
-
-
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_start.csv"
 main_df = read.csv(csv_path,stringsAsFactors=TRUE)
 
 # Hepler functions --------------------------------------------
