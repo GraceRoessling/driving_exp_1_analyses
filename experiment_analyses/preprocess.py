@@ -68,6 +68,7 @@ def run(SUBJECT_PATH):
             total_lane_dev_dict,track_piece_lane_dev_dict = dataframe_helper_functions.get_metrics_for_each_track_piece_for_one_trial("lane_dev",subject_object.trials[i],subject_object.trials[i].map)
             entire_trial_steering_acc,track_piece_steering_acc_dict = dataframe_helper_functions.get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial("steering_acc",subject_object.trials[i],subject_object.trials[i].map)
             subject_object.speed[i+1] = {f"trial_total":total_speed_dict,f"trial_piece":track_piece_speed_dict}
+            #if i == 6: print(subject_object.speed[i+1])
             subject_object.steering[i+1] = {f"trial_total":total_steering_dict,f"trial_piece":track_piece_steering_dict}
             subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
             subject_object.lane_dev[i+1] = {f"trial_total":total_lane_dev_dict,f"trial_piece":track_piece_lane_dev_dict}

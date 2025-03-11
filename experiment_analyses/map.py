@@ -9,7 +9,7 @@ class Map:
         "2": {"high_visibility": ["long_straight","large_horseshoe","short_straight_1","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
         "low_visibility": ["u_turn"]},
 
-        "3" :{"high_visibility": ["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","turn_3","short_straight_8"],
+        "3" :{"high_visibility": ["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","short_straight_8"],
         "low_visibility": ["turn_3"]},
 
         "4":{"high_visibility": ["long_straight","turn_1","short_straight_1","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","short_straight_5","turn_3","short_straight_6","lane_convergence","short_straight_7","turn_4","short_straight_8"],
@@ -21,7 +21,7 @@ class Map:
         "6": {"high_visibility": ["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","short_straight_3","turn_4","short_straight_4","short_straight_5","turn_1","short_straight_6","turn_2","short_straight_7","zig_zag","short_straight_8"],
         "low_visibility": ["small_horseshoe"]},
 
-        "7": {"high_visibility": ["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","turn_3","short_straight_6","turn_4","short_straight_7","zig_zag","short_straight_8"],
+        "7": {"high_visibility": ["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","turn_3","short_straight_6","turn_4","short_straight_7","short_straight_8"],
         "low_visibility": ["zig_zag"]},
 
         "8": {"high_visibility": ["long_straight","short_straight_1","u_turn","short_straight_2","turn_1","short_straight_3","small_horseshoe","short_straight_4","lane_convergence","short_straight_5","turn_3","short_straight_6","y_turn","short_straight_7","turn_5","short_straight_8"],
@@ -41,7 +41,7 @@ class Map:
         "1":["long_straight","zig_zag","short_straight_1","u_turn","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_1","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_3","short_straight_8"],
         "2":["long_straight","large_horseshoe","short_straight_1","u_turn","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
         "3":["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","turn_3","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","turn_3","short_straight_8"],
-        "4":["long_straight","turn_1","short_straight_1","y_turn","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_4","short_straight_7"],
+        "4":["long_straight","turn_1","short_straight_1","y_turn","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_4","short_straight_7","short_straight_8"],
         "5":["long_straight","turn_2","short_straight_1","turn_3","short_straight_2","turn_4","short_straight_3","zig_zag","short_straight_4","large_horseshoe","short_straight_5","y_turn","short_straight_6","lane_convergence","short_straight_7","turn_1","short_straight_8"],
         "6":["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","short_straight_3","turn_4","short_straight_4","small_horseshoe","short_straight_5","turn_1","short_straight_6","turn_2","short_straight_7","zig_zag","short_straight_8"],
         "7":["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","zig_zag","short_straight_6","turn_3","short_straight_7","turn_4","short_straight_8"],
