@@ -1,6 +1,7 @@
 import pandas as pd
 import dataframe_helper_functions
 import map
+import subject
 
 class Piece:
     "This is the piece class. A piece is a single track piece of a certain shape (i.e. S-turn) in a given map. Each map has 6 pieces."
@@ -14,7 +15,7 @@ class Piece:
         self.piece_dict = map.dict
         self.map_number = map.map_number
         self.dataframes = self.filter_dataframes(trial)
-        self.visibility = self.get_visibility(trial)
+        self.visibility = self.get_visibility(map.map_number)
 
     def filter_dataframes(self,trial):
         main_cam_df = trial.paths["main_camera"]
@@ -26,12 +27,11 @@ class Piece:
                     "Vehicle_DrivingSim":track_piece_driving_sim_df}
         return(piece_dfs)
     
-    def get_visibility(self,trial):
-        trial_num = str(trial.number) # get trial number
-        map_dict = map.Map.map_pieces_dict[trial_num]
+    def get_visibility(self,map_number):
+        map_dict = map.Map.map_pieces_dict[map_number]
         for key, values in map_dict.items():
             if self.id in values:
-                return key
+                return key 
 
 
 

@@ -46,6 +46,7 @@ def initialize_maps_and_pieces(subject):
         trial_object.pieces = piece_obj_dict
         trial_object.reset_counts_dict = map_object.reset_counts_dict
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Main
 
