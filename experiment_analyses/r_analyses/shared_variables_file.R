@@ -9,7 +9,7 @@ library(patchwork)
 library(effectsize)
 
 # To compare between both visibility conditions without straight pieces
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_start.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_only_curved_segments.csv"
 main_df = read.csv(csv_path,stringsAsFactors=TRUE)
 
 # Hepler functions --------------------------------------------
