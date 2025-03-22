@@ -5,8 +5,6 @@ import subject
 
 class Piece:
     "This is the piece class. A piece is a single track piece of a certain shape (i.e. S-turn) in a given map. Each map has 6 pieces."
-
-    # map_1_landmark_pieces = ["left_turn_med","right_turn_short","s_turn_short"] # note: these are low visibility...
     
     def __init__(self, id, subject, trial,map):
         self.id = id
@@ -16,6 +14,7 @@ class Piece:
         self.map_number = map.map_number
         self.dataframes = self.filter_dataframes(trial)
         self.visibility = self.get_visibility(map.map_number)
+        self.centerline_df = self.get_centerline_for_piece(map)
 
     def filter_dataframes(self,trial):
         main_cam_df = trial.paths["main_camera"]
@@ -33,6 +32,17 @@ class Piece:
             if self.id in values:
                 return key 
 
+    def get_centerline_for_piece(self, map):
+        entire_track_centerline_df = map.centerline_df 
+        all_segments_list = list(map.ordinal_map_pieces_dict[map.map_number]) # get index of track piece of interest
+        piece_index_number = all_segments_list.index(self.id)
+        if map.map_number == "11": # remove the track segments that are not captured in Trial 11
+            entire_track_centerline_df = entire_track_centerline_df[
+                (entire_track_centerline_df['segment'] % 2 != 0) | (entire_track_centerline_df['segment'] == 0)
+            ]
+            entire_track_centerline_df = entire_track_centerline_df.reset_index(drop=True)
+        centerline_df = entire_track_centerline_df[entire_track_centerline_df['segment'] == piece_index_number]
+        return centerline_df
 
 
         

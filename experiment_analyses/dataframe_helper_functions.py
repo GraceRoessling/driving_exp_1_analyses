@@ -1,10 +1,12 @@
 import pandas as pd
+import map
 import piece
 import math
 import re
 import IPython
 import numpy as np
 from collections import defaultdict
+import os
 import steering_acceleration_analysis
 
 # filter dataframes --------------------------------------------------------------------------
@@ -15,18 +17,18 @@ def extract_map_number(filename):
         return int(match.group(1))
     return None  # Return None if no match is found
 
-def clean_track_data(df):
-    if "RESET" not in df["current_track_piece"].values:
-        return df, {}  # No RESET, return original dataframe
+def clean_track_data(driving_vars_df,cam_position_df,vehicle_position_df):
+    if "RESET" not in driving_vars_df["current_track_piece"].values:
+        return driving_vars_df, cam_position_df, vehicle_position_df, {}  # No RESET, return original dataframe
 
     indices_to_remove = set()
     reset_clusters = []  # To store separate clusters of "RESET"
 
     # Identify contiguous clusters of "RESET"
-    reset_indices = df.index[df["current_track_piece"] == "RESET"].tolist()
+    reset_indices = driving_vars_df.index[driving_vars_df["current_track_piece"] == "RESET"].tolist()
     
     if not reset_indices:
-        return df, {}  # No RESET occurrences, return original dataframe
+        return driving_vars_df, cam_position_df, vehicle_position_df, {}  # No RESET occurrences, return original dataframe
 
     reset_counts = {}  # Dictionary to track preceding track names and RESET counts
     # Group contiguous RESET indices into clusters
@@ -45,8 +47,8 @@ def clean_track_data(df):
         
         # Identify the preceding cluster
         if first_reset_idx > 0:
-            prev_track_piece = df.loc[first_reset_idx - 1, "current_track_piece"]
-            prev_cluster_indices = df.index[df["current_track_piece"] == prev_track_piece].tolist()
+            prev_track_piece = driving_vars_df.loc[first_reset_idx - 1, "current_track_piece"]
+            prev_cluster_indices = driving_vars_df.index[driving_vars_df["current_track_piece"] == prev_track_piece].tolist()
             reset_counts[prev_track_piece] = 1
 
             # Remove only if the previous cluster ends right before RESET
@@ -57,9 +59,12 @@ def clean_track_data(df):
         indices_to_remove.update(cluster)
 
     # Create a new dataframe without the identified clusters
-    df = df.drop(indices_to_remove).reset_index(drop=True)
+    driving_vars_df = driving_vars_df.drop(indices_to_remove).reset_index(drop=True)
+    # make sure the other dataframes match!
+    cam_position_df = cam_position_df.drop(indices_to_remove).reset_index(drop=True)
+    vehicle_position_df = vehicle_position_df.drop(indices_to_remove).reset_index(drop=True)
 
-    return df, reset_counts
+    return driving_vars_df, cam_position_df, vehicle_position_df, reset_counts
 
 def modify_duplicate_sequences(df):
 # Identify clusters of "short_straight"
@@ -111,6 +116,29 @@ def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,dri
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
     return(track_piece_cam_pos,track_piece_vehicle_pos,track_piece_driving_var)
+
+def find_closest_point(camera_position_df, center_x, center_y):
+    # Calculate the Euclidean distance between each point in the trajectory and the center point
+    distances = np.sqrt((camera_position_df['pos_x'] - center_x) ** 2 + (camera_position_df['pos_z'] - center_y) ** 2)
+    
+    # Find the index of the minimum distance
+    closest_index = distances.idxmin()
+    
+    return closest_index
+ 
+def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
+    # get last two points in the center line df
+    centerline_df = piece_object.centerline_df
+    center_x, center_y = centerline_df.iloc[-1,1],centerline_df.iloc[-1,2] # end of the short straight segment
+
+    # get trajectory of track piece of interest
+    untrimmed_traj = piece_object.trajectory_df
+
+    # trim trajectory
+    closest_index = find_closest_point(untrimmed_traj, center_x, center_y) # get index of last short straight segment along traj
+    trimmed_traj = untrimmed_traj.iloc[:closest_index] # grab all the points after this point
+
+    return(trimmed_traj)
 
 def remove_substring(string_list, substring):
     cleaned_list = []

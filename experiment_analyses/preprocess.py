@@ -23,7 +23,7 @@ def initialize_trials_for_one_subject(subject):
     for count, trial_string in enumerate(trial.Trial.trial_str_list):
         trial_id = trial_string
         trial_num = count +1
-        trial_object = trial.Trial(trial_id,trial_num, subject)
+        trial_object = trial.Trial(trial_id,trial_num,subject)
         trial_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_map(trial_object)
         trial_object_list.append(trial_object)
     subject.trials = trial_object_list
@@ -39,6 +39,7 @@ def initialize_maps_and_pieces(subject):
         for track_id in map_object.pieces:
             piece_object = piece.Piece(track_id,subject,trial_object,map_object)
             piece_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_piece(piece_object)
+            if i == 11: piece_object.trajectory_df = dataframe_helper_functions.trim_traj_for_trial_11_for_dtw_analysis(piece_object)
             piece_obj_dict[track_id] = piece_object
 
         trial_object.number = i
