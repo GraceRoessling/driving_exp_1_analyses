@@ -34,13 +34,24 @@ class Piece:
 
     def get_centerline_for_piece(self, map):
         entire_track_centerline_df = map.centerline_df 
-        all_segments_list = list(map.ordinal_map_pieces_dict[map.map_number]) # get index of track piece of interest
+        trial_11_dict = {
+            "long_straight": "chicane",
+            "short_straight_1": "triple_s",
+            "short_straight_2": "symmetric_parabolic",
+            "short_straight_3": "traffic_circle",
+            "short_straight_4": "asymmetric_parabolic_2",
+            "short_straight_5": "t_turn",
+            "short_straight_6": "asymmetric_parabolic_1",
+            "short_straight_7": "spiral",
+            "short_straight_8":"short_straight_8"
+        }
+        if self.map_number == "11": # for map 11, the track pieces will be shifted based on the dictionary
+            self.id = trial_11_dict[self.id]
+            all_segments_list = list(map.ordinal_map_pieces_dict["10"])
+        else:
+            all_segments_list = list(map.ordinal_map_pieces_dict[map.map_number])
+            
         piece_index_number = all_segments_list.index(self.id)
-        if map.map_number == "11": # remove the track segments that are not captured in Trial 11
-            entire_track_centerline_df = entire_track_centerline_df[
-                (entire_track_centerline_df['segment'] % 2 != 0) | (entire_track_centerline_df['segment'] == 0)
-            ]
-            entire_track_centerline_df = entire_track_centerline_df.reset_index(drop=True)
         centerline_df = entire_track_centerline_df[entire_track_centerline_df['segment'] == piece_index_number]
         return centerline_df
 
