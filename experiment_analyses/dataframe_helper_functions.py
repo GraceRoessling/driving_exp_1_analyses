@@ -111,7 +111,7 @@ def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
 
 def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,driving_vars_df):
     indices_for_track_piece = list(driving_vars_df.index[driving_vars_df['current_track_piece'].str.contains(piece_object.id)])
-    track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]    
+    track_piece_driving_var = driving_vars_df[driving_vars_df['current_track_piece'].str.contains(piece_object.id)]   
     first_index,last_index = indices_for_track_piece[0],indices_for_track_piece[-1]
     track_piece_cam_pos = cam_position_df.iloc[first_index:last_index+1]
     track_piece_vehicle_pos = vehicle_position_df.iloc[first_index:last_index+1]
@@ -255,6 +255,8 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
 
     # iterate through track pieces and get speed info for each
     for track_piece_id in all_track_pieces:
+        print("TRACK PIECE ID",track_piece_id)
+        print("---------------------------------------------------------------------------------------------")
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]
         

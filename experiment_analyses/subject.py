@@ -4,8 +4,8 @@ class Subject:
     "This is the subject class. A subject is a person object that has performance information affiliated to their driving behavior."
     
     subject_id_dict = {
-    "familiar": ["slab"],
-    "unfamiliar": ["guy"]
+    "familiar": ["five", "grip", "mule", "polio"],
+    "unfamiliar": ["grid", "swarm", "wok"]
     }
 
     def __init__(self, id, condition, dir_path):

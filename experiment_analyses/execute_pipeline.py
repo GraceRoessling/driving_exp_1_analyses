@@ -1,6 +1,6 @@
 import preprocess
 import warnings
-SUBJECT_PATH = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/pilot_data"
+SUBJECT_PATH = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/main_analysis"
 
 warnings.filterwarnings("ignore")
 

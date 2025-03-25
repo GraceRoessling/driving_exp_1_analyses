@@ -35,7 +35,6 @@ def initialize_maps_and_pieces(subject):
         # iterate through track pieces for a given subject
         trial_object = subject.trials[i]
         map_object = map.Map(subject,trial_object)
-
         for track_id in map_object.pieces:
             piece_object = piece.Piece(track_id,subject,trial_object,map_object)
             piece_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_piece(piece_object)

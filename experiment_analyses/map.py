@@ -45,7 +45,7 @@ class Map:
         "3":["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","turn_3","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","turn_3","short_straight_8"],
         "4":["long_straight","turn_1","short_straight_1","y_turn","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_4","short_straight_7","short_straight_8"],
         "5":["long_straight","turn_2","short_straight_1","turn_3","short_straight_2","turn_4","short_straight_3","zig_zag","short_straight_4","large_horseshoe","short_straight_5","y_turn","short_straight_6","lane_convergence","short_straight_7","turn_1","short_straight_8"],
-        "6":["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","short_straight_3","turn_4","short_straight_4","small_horseshoe","short_straight_5","turn_1","short_straight_6","turn_2","short_straight_7","zig_zag","short_straight_8"],
+        "6":["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","turn_4","short_straight_3","small_horseshoe","short_straight_4","turn_1","short_straight_5","turn_2","short_straight_6","zig_zag","short_straight_7"],
         "7":["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","zig_zag","short_straight_6","turn_3","short_straight_7","turn_4","short_straight_8"],
         "8":["long_straight","turn_2","short_straight_1","u_turn","short_straight_2","turn_1","short_straight_3","small_horseshoe","short_straight_4","lane_convergence","short_straight_5","turn_3","short_straight_6","y_turn","short_straight_7","turn_5","short_straight_8"],
         "9":["long_straight","turn_4","short_straight_1","turn_4","short_straight_2","u_turn","short_straight_3","lane_convergence","short_straight_4","y_turn","short_straight_5","zig_zag","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
@@ -76,6 +76,9 @@ class Map:
         else:
             trial.paths["Vehicle_DrivingSim"], trial.paths["main_camera"],trial.paths["vehicle_movement"],reset_counts_dict = dataframe_helper_functions.clean_track_data(driving_sim_df,cam_position_df,vehicle_position_df)
         trial.paths["Vehicle_DrivingSim"] = dataframe_helper_functions.modify_duplicate_sequences(driving_sim_df)
+        # if self.subject_id == "grid" and self.trial.number == 3:
+        #     print("--------------------------------------------------------------------------------------------------")
+        #     print("UNIQUE TRACK PIECES-- FOR SHORT STRAIGHT ANALYSIS",trial.paths["Vehicle_DrivingSim"]["current_track_piece"].unique())
         return(reset_counts_dict)
 
     def get_centerline_for_map(self,map_number):
