@@ -32,7 +32,7 @@ mean_speed_plot <- ggplot(mean_speed_plot_df, aes(x = visibility, y = mean_speed
   theme(legend.position="none") +
   #coord_fixed(ratio = 0.08)+
   larger_text_theme(base_size = 12)+
-  theme(legend.position = "none")+
+  theme(legend.position = "top")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
                            "inches")) 
 
@@ -84,7 +84,7 @@ sd_speed_plot <- ggplot(sd_speed_plot_df, aes(x = visibility, y = sd_speeds, col
   theme(legend.position="none") +
   #coord_fixed(ratio = 0.38)+
   larger_text_theme(base_size = 12)+
-  theme(legend.position = "none")+
+  theme(legend.position = "top")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
                            "inches")) 
 

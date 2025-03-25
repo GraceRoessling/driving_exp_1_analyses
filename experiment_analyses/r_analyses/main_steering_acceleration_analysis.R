@@ -33,7 +33,7 @@ mean_steering_acceleration_plot <- ggplot(steering_acceleration_plot_df, aes(x =
   larger_text_theme(base_size = 12)+
   theme(legend.position="none") +
   coord_fixed(ratio = 0.04)+
-  theme(legend.position="none")
+  theme(legend.position="top")
 
 mean_steering_acceleration_plot
 

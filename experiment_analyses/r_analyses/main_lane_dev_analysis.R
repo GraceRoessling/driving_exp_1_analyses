@@ -35,7 +35,7 @@ mean_ld_plot <- ggplot(mean_lane_dev_plot_df, aes(x = visibility, y = mean_lane_
   scale_y_continuous(breaks=number_ticks(5))+
   #coord_fixed(ratio = 1.5)+
   larger_text_theme(base_size = 12)+
-  theme(legend.position="none")+
+  theme(legend.position="top")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
                            "inches")) 
 
@@ -86,7 +86,7 @@ sd_ld_plot <- ggplot(sd_lane_dev_plot_df, aes(x = visibility, y = sd_lane_devs, 
   scale_x_discrete(labels =c("High", "Low"),expand = c(0, 0.1)) +
   larger_text_theme(base_size = 12)+
   #coord_fixed(ratio = 2)+
-  theme(legend.position="none")
+  theme(legend.position="top")
 
 sd_ld_plot
 

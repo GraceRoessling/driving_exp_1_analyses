@@ -37,6 +37,6 @@ within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y 
   scale_x_discrete(labels = 1:10) +
   larger_text_theme(base_size = 12)+
   #coord_fixed(ratio = 0.4)+
-  theme(legend.position = "topright")
+  theme(legend.position = "top")
 
 within_steering_acceleration_plot

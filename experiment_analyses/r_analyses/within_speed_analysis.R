@@ -76,7 +76,7 @@ within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color
   scale_x_discrete(labels = 1:10) +
   #coord_fixed(ratio = 2.7)+
   larger_text_theme(base_size = 12) +
-  theme(legend.position = "none")
+  theme(legend.position = "top")
 
 within_mean_speed_plot / within_sd_speed_plot
 

@@ -73,7 +73,7 @@ within_sd_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = 
   scale_x_discrete(labels = 1:10) +
   larger_text_theme(base_size = 12) +
   #coord_fixed(ratio = 12)+
-  theme(legend.position = "none")
+  theme(legend.position = "top")
 
 
 within_sd_ld_plot
