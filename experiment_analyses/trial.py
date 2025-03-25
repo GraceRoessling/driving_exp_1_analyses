@@ -29,6 +29,10 @@ class Trial:
                     driving_sim_df = pd.read_csv (driving_sim_path)
         main_cam_df,vehicle_df,driving_sim_df = dataframe_helper_functions.remove_NA(main_cam_df,vehicle_df,driving_sim_df)
         driving_sim_df = dataframe_helper_functions.convert_steering_value(driving_sim_df)
+        # add the current track column to the other dataframes
+        current_track_column = driving_sim_df["current_track_piece"]
+        main_cam_df["current_track_piece"] = current_track_column
+        vehicle_df["current_track_piece"] = current_track_column
         paths = {"main_camera":main_cam_df,
                 "vehicle_movement":vehicle_df,
                 "Vehicle_DrivingSim":driving_sim_df} 
