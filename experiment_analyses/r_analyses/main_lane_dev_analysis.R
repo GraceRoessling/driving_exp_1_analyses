@@ -33,7 +33,7 @@ mean_ld_plot <- ggplot(mean_lane_dev_plot_df, aes(x = visibility, y = mean_lane_
   labs(x = "Visibility", y = "Mean Abs. Lane \n Deviation (meters)", color = "Track Constancy") +
   scale_x_discrete(labels =c("High", "Low"),expand = c(0, 0.1)) +
   scale_y_continuous(breaks=number_ticks(5))+
-  coord_fixed(ratio = 1.5)+
+  #coord_fixed(ratio = 1.5)+
   larger_text_theme(base_size = 12)+
   theme(legend.position="none")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
@@ -85,13 +85,13 @@ sd_ld_plot <- ggplot(sd_lane_dev_plot_df, aes(x = visibility, y = sd_lane_devs, 
   labs(x = "Visibility", y = "SD of Abs. Lane \n Deviation (meters)", color = "Track Exposure") +
   scale_x_discrete(labels =c("High", "Low"),expand = c(0, 0.1)) +
   larger_text_theme(base_size = 12)+
-  coord_fixed(ratio = 2)+
+  #coord_fixed(ratio = 2)+
   theme(legend.position="none")
 
 sd_ld_plot
 
 (mean_ld_plot | sd_ld_plot) + 
-  plot_layout(heights = c(1, 1)) +
+  #plot_layout(heights = c(1, 1)) +
   plot_annotation(tag_levels = 'A')
 
 # Long format

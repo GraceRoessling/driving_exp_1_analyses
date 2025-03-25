@@ -2,7 +2,7 @@ import numpy as np
 
 def calculate_average_steering_acceleration(df):
     if len(df) < 5:
-        return df["steering_angle"].iloc[0]
+        return np.nan
     else:
         # Get desired arrays (time and steering angle)
         time_series = df["time"]

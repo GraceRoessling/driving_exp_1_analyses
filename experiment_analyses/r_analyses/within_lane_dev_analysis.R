@@ -36,7 +36,7 @@ within_mean_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color 
   labs(x = "Trials", y = "Mean Abs. Lane \n Deviation (meters)", color = "Track Constancy") +
   scale_x_discrete(labels = 1:10) +
   larger_text_theme(base_size = 12) +
-  coord_fixed(ratio = 8)+
+  #coord_fixed(ratio = 8)+
   theme(legend.position = "none")
 
 within_mean_ld_plot
@@ -72,14 +72,14 @@ within_sd_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = 
   labs(x = "Trials", y = "SD of Abs. Lane \n Deviation (meters)", color = "Track Constancy") +
   scale_x_discrete(labels = 1:10) +
   larger_text_theme(base_size = 12) +
-  coord_fixed(ratio = 12)+
+  #coord_fixed(ratio = 12)+
   theme(legend.position = "none")
 
 
 within_sd_ld_plot
 
-#within_mean_ld_plot / within_sd_ld_plot
-(within_mean_ld_plot | within_sd_ld_plot) + 
-  plot_layout(heights = c(1, 1)) +
-  plot_annotation(tag_levels = 'A')
+within_mean_ld_plot / within_sd_ld_plot
+#(within_mean_ld_plot | within_sd_ld_plot) + 
+#  plot_layout(heights = c(1, 1)) +
+#  plot_annotation(tag_levels = 'A')
 

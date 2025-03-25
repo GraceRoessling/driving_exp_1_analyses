@@ -30,7 +30,7 @@ mean_speed_plot <- ggplot(mean_speed_plot_df, aes(x = visibility, y = mean_speed
   labs(x = "Visibility", y = "Mean Speed (m/s)", color = "Track Constancy")+
   scale_x_discrete(labels = c("High", "Low"),expand = c(0, 0.13))+
   theme(legend.position="none") +
-  coord_fixed(ratio = 0.08)+
+  #coord_fixed(ratio = 0.08)+
   larger_text_theme(base_size = 12)+
   theme(legend.position = "none")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
@@ -82,7 +82,7 @@ sd_speed_plot <- ggplot(sd_speed_plot_df, aes(x = visibility, y = sd_speeds, col
   labs(x = "Visibility", y = "SD of Speed (m/s)", color = "Track Constancy")+
   scale_x_discrete(labels = c("High", "Low"),expand = c(0, 0.13))+
   theme(legend.position="none") +
-  coord_fixed(ratio = 0.38)+
+  #coord_fixed(ratio = 0.38)+
   larger_text_theme(base_size = 12)+
   theme(legend.position = "none")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
