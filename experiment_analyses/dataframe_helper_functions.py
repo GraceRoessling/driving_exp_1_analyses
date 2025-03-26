@@ -225,7 +225,7 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
             piece_df_column = driving_sim_df["steering_angle"]
         elif metric_type_as_string == "lane_dev":
             piece_df_column =  driving_sim_df["lane_deviation"]
-            piece_df_column = 5 - piece_df_column
+            piece_df_column = piece_df_column - 2.5
             #piece_df_column = piece_df_column.abs()
         piece_mean = piece_df_column.mean()
         piece_var = piece_df_column.var()
