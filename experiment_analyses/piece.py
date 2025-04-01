@@ -5,11 +5,24 @@ import subject
 
 class Piece:
     "This is the piece class. A piece is a single track piece of a certain shape (i.e. S-turn) in a given map. Each map has 6 pieces."
-    
+    trial_11_dict = {
+        "long_straight": "chicane",
+        "short_straight_1": "triple_s",
+        "short_straight_2": "symmetric_parabolic",
+        "short_straight_3": "traffic_circle",
+        "short_straight_4": "asymmetric_parabolic_2",
+        "short_straight_5": "t_turn",
+        "short_straight_6": "asymmetric_parabolic_1",
+        "short_straight_7": "spiral",
+        "short_straight_8":"short_straight_8"
+    }
+
+
     def __init__(self, id, subject, trial,map):
         self.id = id
         self.subject_id = subject.id
         self.trial_id = trial.id
+        self.map_object = map
         self.piece_dict = map.dict
         self.map_number = map.map_number
         self.dataframes = self.filter_dataframes(trial)
@@ -34,19 +47,8 @@ class Piece:
 
     def get_centerline_for_piece(self, map):
         entire_track_centerline_df = map.centerline_df 
-        trial_11_dict = {
-            "long_straight": "chicane",
-            "short_straight_1": "triple_s",
-            "short_straight_2": "symmetric_parabolic",
-            "short_straight_3": "traffic_circle",
-            "short_straight_4": "asymmetric_parabolic_2",
-            "short_straight_5": "t_turn",
-            "short_straight_6": "asymmetric_parabolic_1",
-            "short_straight_7": "spiral",
-            "short_straight_8":"short_straight_8"
-        }
         if self.map_number == "11": # for map 11, the track pieces will be shifted based on the dictionary
-            self.id = trial_11_dict[self.id]
+            self.id = Piece.trial_11_dict[self.id]
             all_segments_list = list(map.ordinal_map_pieces_dict["10"])
         else:
             all_segments_list = list(map.ordinal_map_pieces_dict[map.map_number])

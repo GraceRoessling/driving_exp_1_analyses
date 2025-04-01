@@ -9,6 +9,7 @@ from collections import defaultdict
 import os
 import steering_acceleration_analysis
 
+
 # filter dataframes --------------------------------------------------------------------------
 
 def extract_map_number(filename):
@@ -120,25 +121,37 @@ def get_track_piece_indices(piece_object,cam_position_df,vehicle_position_df,dri
 def find_closest_point(camera_position_df, center_x, center_y):
     # Calculate the Euclidean distance between each point in the trajectory and the center point
     distances = np.sqrt((camera_position_df['pos_x'] - center_x) ** 2 + (camera_position_df['pos_z'] - center_y) ** 2)
-    
     # Find the index of the minimum distance
     closest_index = distances.idxmin()
     
     return closest_index
  
 def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
-    # get last two points in the center line df
-    centerline_df = piece_object.centerline_df
-    center_x, center_y = centerline_df.iloc[-1,1],centerline_df.iloc[-1,2] # end of the short straight segment
+    # get the centerline for the short straight segment preceding the curved turn of interest
+    entire_track_centerline_df = piece_object.map_object.centerline_df
+    shifted_piece = next((k for k, v in piece.Piece.trial_11_dict.items() if v == piece_object.id), None)
+    all_segments_list = list(map.Map.ordinal_map_pieces_dict["10"])
+    piece_index_number = all_segments_list.index(shifted_piece)
+    short_straight_centerline_df = entire_track_centerline_df[entire_track_centerline_df['segment'] == piece_index_number]
 
+    # get last two points in the center line df
+    end_of_short_straight_center_x, end_of_short_straight_center_y = short_straight_centerline_df.iloc[-1,1],short_straight_centerline_df.iloc[-1,2] # end of the short straight segment
     # get trajectory of track piece of interest
     untrimmed_traj = piece_object.trajectory_df
 
-    # trim trajectory
-    closest_index = find_closest_point(untrimmed_traj, center_x, center_y) # get index of last short straight segment along traj
-    trimmed_traj = untrimmed_traj.iloc[:closest_index] # grab all the points after this point
+    # trim trajectory 
+    idx_of_traj_closest_to_end_of_short_straight = find_closest_point(untrimmed_traj, end_of_short_straight_center_x, end_of_short_straight_center_y) # get index of last short straight segment along traj
+    trimmed_traj = untrimmed_traj.iloc[idx_of_traj_closest_to_end_of_short_straight:] # grab all points after this point
 
-    return(trimmed_traj)
+    investigation_dict = {
+        "short_centerline_df":short_straight_centerline_df,
+        "closest_point_to_short_centerline":[untrimmed_traj['pos_x'][idx_of_traj_closest_to_end_of_short_straight],untrimmed_traj['pos_z'][idx_of_traj_closest_to_end_of_short_straight]],
+        "end_of_short_straight":[end_of_short_straight_center_x, end_of_short_straight_center_y],
+        "idx_of_traj_closest_to_end_of_short_straight":idx_of_traj_closest_to_end_of_short_straight,
+    }
+   
+    return(untrimmed_traj,investigation_dict)
+
 
 def remove_substring(string_list, substring):
     cleaned_list = []
@@ -179,7 +192,7 @@ def get_speed_per_frame(driving_vars_df):
 map_to_steering_angle = lambda input,input_start,input_end,output_start,output_end: output_start + ((output_end - output_start) / (input_end - input_start)) * (input - input_start)
 def convert_steering_value(driving_vars_df):
     input_start, input_end = -1, 1
-    output_start, output_end = -135, 135
+    output_start, output_end = -900, 900
     
     # take steering input and convert from -1 to 1 --> 0 --> 35 degrees
     steering_array = driving_vars_df['steering_angle'].tolist()
@@ -255,8 +268,6 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
 
     # iterate through track pieces and get speed info for each
     for track_piece_id in all_track_pieces:
-        print("TRACK PIECE ID",track_piece_id)
-        print("---------------------------------------------------------------------------------------------")
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]
         

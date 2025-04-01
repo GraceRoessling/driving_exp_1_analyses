@@ -38,7 +38,7 @@ def initialize_maps_and_pieces(subject):
         for track_id in map_object.pieces:
             piece_object = piece.Piece(track_id,subject,trial_object,map_object)
             piece_object.trajectory_df = dataframe_helper_functions.get_agent_trajectory_for_each_piece(piece_object)
-            if i == 11: piece_object.trajectory_df = dataframe_helper_functions.trim_traj_for_trial_11_for_dtw_analysis(piece_object)
+            if trial_object.number == 11: piece_object.trajectory_df,piece_object.investigation_dict = dataframe_helper_functions.trim_traj_for_trial_11_for_dtw_analysis(piece_object)
             piece_obj_dict[track_id] = piece_object
 
         trial_object.number = i
