@@ -140,6 +140,7 @@ def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
     untrimmed_traj = piece_object.trajectory_df
 
     # trim trajectory 
+    untrimmed_traj = untrimmed_traj.reset_index()
     idx_of_traj_closest_to_end_of_short_straight = find_closest_point(untrimmed_traj, end_of_short_straight_center_x, end_of_short_straight_center_y) # get index of last short straight segment along traj
     trimmed_traj = untrimmed_traj.iloc[idx_of_traj_closest_to_end_of_short_straight:] # grab all points after this point
 
@@ -150,7 +151,7 @@ def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
         "idx_of_traj_closest_to_end_of_short_straight":idx_of_traj_closest_to_end_of_short_straight,
     }
    
-    return(untrimmed_traj,investigation_dict)
+    return(trimmed_traj,investigation_dict)
 
 
 def remove_substring(string_list, substring):
