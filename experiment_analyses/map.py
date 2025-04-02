@@ -76,9 +76,9 @@ class Map:
         else:
             trial.paths["Vehicle_DrivingSim"], trial.paths["main_camera"],trial.paths["vehicle_movement"],reset_counts_dict = dataframe_helper_functions.clean_track_data(driving_sim_df,cam_position_df,vehicle_position_df)
         trial.paths["Vehicle_DrivingSim"] = dataframe_helper_functions.modify_duplicate_sequences(driving_sim_df)
-        current_track_column = driving_sim_df["current_track_piece"]
-        trial.paths["main_camera"]["current_track_piece"] = current_track_column
-        trial.paths["vehicle_movement"]["current_track_piece"] = current_track_column
+        # current_track_column = driving_sim_df["current_track_piece"]
+        # trial.paths["main_camera"]["current_track_piece"] = current_track_column
+        # trial.paths["vehicle_movement"]["current_track_piece"] = current_track_column
 
         return(reset_counts_dict)
 
