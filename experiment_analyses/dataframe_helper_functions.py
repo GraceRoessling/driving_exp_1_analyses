@@ -8,6 +8,7 @@ import numpy as np
 from collections import defaultdict
 import os
 import steering_acceleration_analysis
+import trial
 
 
 # filter dataframes --------------------------------------------------------------------------
@@ -85,6 +86,10 @@ def modify_duplicate_sequences(df):
     return df
 
 
+def trial_11_string_replacement(driving_sim_df):
+    driving_sim_df["current_track_piece"] = driving_sim_df["current_track_piece"].replace(trial.Trial.trial_11_dict)
+    return(driving_sim_df)
+
 def find_ranges(lst, target):
     result = []
     start = -1
@@ -101,7 +106,6 @@ def find_ranges(lst, target):
         result.extend([start, len(lst)-1])
 
     return result
-
 
 def remove_NA(cam_position_df,vehicle_position_df,driving_vars_df):
     na_indices = list(driving_vars_df.loc[pd.isna(driving_vars_df["current_track_piece"]), :].index)
@@ -125,7 +129,21 @@ def find_closest_point(camera_position_df, center_x, center_y):
     closest_index = distances.idxmin()
     
     return closest_index
- 
+
+def trim_trial_11_hiccups(df):
+    # Compute the differences in pos_x and pos_z
+    dx = df['pos_x'].diff().abs()
+    dz = df['pos_z'].diff().abs()
+    
+    # Find the first occurrence where the delta exceeds 30 in either dimension
+    mask = (dx > 30) | (dz > 30)
+    
+    if mask.any():
+        trim_index = mask.idxmax()  # Get the index where the jump occurs
+        df = df.loc[:trim_index-1]  # Trim the DataFrame before the jump
+    
+    return df
+
 def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
     # get the centerline for the short straight segment preceding the curved turn of interest
     entire_track_centerline_df = piece_object.map_object.centerline_df
@@ -139,10 +157,18 @@ def trim_traj_for_trial_11_for_dtw_analysis(piece_object):
     # get trajectory of track piece of interest
     untrimmed_traj = piece_object.trajectory_df
 
-    # trim trajectory 
+    # trim trajectory w.r.t. short straight segment
     untrimmed_traj = untrimmed_traj.reset_index()
     idx_of_traj_closest_to_end_of_short_straight = find_closest_point(untrimmed_traj, end_of_short_straight_center_x, end_of_short_straight_center_y) # get index of last short straight segment along traj
     trimmed_traj = untrimmed_traj.iloc[idx_of_traj_closest_to_end_of_short_straight:] # grab all points after this point
+    trimmed_traj = trim_trial_11_hiccups(trimmed_traj)
+    # trim trajectory w.r.t. hiccups'
+    # if piece_object.subject_id == "clerk":
+    #     print("========================================================")
+    #     print("Piece ID:", piece_object.id)
+    #     print("Length of trajectory pre-hiccup trim", len(trimmed_traj))
+    #     trimmed_traj = trim_trial_11_hiccups(trimmed_traj)
+    #     print("Length of trajectory post-hiccup trim", len(trimmed_traj))
 
     investigation_dict = {
         "short_centerline_df":short_straight_centerline_df,

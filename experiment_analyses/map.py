@@ -35,7 +35,7 @@ class Map:
         "10": {"high_visibility": ["long_straight","chicane","short_straight_1","short_straight_2","short_straight_3","traffic_circle","short_straight_4","asymmetric_parabolic_2","short_straight_5","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
         "low_visibility": ["triple_s","symmetric_parabolic","t_turn"]},
 
-        "11": {"high_visibility": ["long_straight","short_straight_1","short_straight_2","short_straight_3","short_straight_4","short_straight_5","short_straight_6","short_straight_7","short_straight_8"],
+        "11": {"high_visibility": ["chicane","triple_s","symmetric_parabolic","traffic_circle","asymmetric_parabolic_2","t_turn","asymmetric_parabolic_1","spiral","short_straight_8"],
         "low_visibility": [None]}
         }
     
@@ -50,7 +50,7 @@ class Map:
         "8":["long_straight","turn_2","short_straight_1","u_turn","short_straight_2","turn_1","short_straight_3","small_horseshoe","short_straight_4","lane_convergence","short_straight_5","turn_3","short_straight_6","y_turn","short_straight_7","turn_5","short_straight_8"],
         "9":["long_straight","turn_4","short_straight_1","turn_4","short_straight_2","u_turn","short_straight_3","lane_convergence","short_straight_4","y_turn","short_straight_5","zig_zag","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
         "10":["long_straight","chicane","short_straight_1","triple_s","short_straight_2","symmetric_parabolic","short_straight_3","traffic_circle","short_straight_4","asymmetric_parabolic_2","short_straight_5","t_turn","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
-        "11":["long_straight","short_straight_1","short_straight_2","short_straight_3","short_straight_4","short_straight_5","short_straight_6","short_straight_7","short_straight_8"],
+        "11":["chicane","triple_s","symmetric_parabolic","traffic_circle","asymmetric_parabolic_2","t_turn","asymmetric_parabolic_1","spiral","short_straight_8"],
     }
    
     def __init__(self,subject,trial):

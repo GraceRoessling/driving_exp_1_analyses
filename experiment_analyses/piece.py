@@ -48,7 +48,7 @@ class Piece:
     def get_centerline_for_piece(self, map):
         entire_track_centerline_df = map.centerline_df 
         if self.map_number == "11": # for map 11, the track pieces will be shifted based on the dictionary
-            self.id = Piece.trial_11_dict[self.id]
+            #self.id = Piece.trial_11_dict[self.id]
             all_segments_list = list(map.ordinal_map_pieces_dict["10"])
         else:
             all_segments_list = list(map.ordinal_map_pieces_dict[map.map_number])
