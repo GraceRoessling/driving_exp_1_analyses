@@ -136,7 +136,7 @@ def trim_trial_11_hiccups(df):
     dz = df['pos_z'].diff().abs()
     
     # Find the first occurrence where the delta exceeds 30 in either dimension
-    mask = (dx > 10) | (dz > 10)
+    mask = (dx > 5) | (dz > 5)
     
     if mask.any():
         trim_index = mask.idxmax()  # Get the index where the jump occurs
