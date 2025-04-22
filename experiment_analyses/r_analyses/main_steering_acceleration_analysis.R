@@ -44,11 +44,8 @@ steering_acceleration_df <- main_df %>%
 
 steering_acceleration.aov <- anova_test(
   data = steering_acceleration_df, dv = steering_acceleration, wid = subject_id,
-  between = condition, within = visibility
+  between = condition, within = visibility,effect.size = "pes"
 )
 
 get_anova_table(steering_acceleration.aov)
 
-mean_steering_anova <- aov(steering_acceleration ~ condition*visibility + Error(subject_id/visibility), steering_acceleration_df)
-summary(mean_steering_anova)
-eta_squared(mean_steering_anova, partial = TRUE)

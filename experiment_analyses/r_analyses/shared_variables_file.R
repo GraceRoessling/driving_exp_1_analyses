@@ -7,6 +7,9 @@ library(rstatix)
 library(gridExtra)
 library(patchwork)
 library(effectsize)
+library(afex)      
+library(emmeans)
+library(broom)
 
 # To compare between both visibility conditions without straight pieces
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_nan.csv"
@@ -104,7 +107,7 @@ calculate_CI <- function(data, column_name, confidence_level = 0.95) {
 subject_id = main_df[["subject_id"]]
 familiarity = main_df[["condition"]]
 main_df <- convert_var_to_sd(main_df)
-main_df <- main_df %>% select(-contains('total')) # if "total" is in the row, take it out
+#main_df <- main_df %>% select(-contains('total')) # if "total" is in the row, take it out
 
 
 # Main analysis : Separate into familiar and unfamiliar groups -----------------
