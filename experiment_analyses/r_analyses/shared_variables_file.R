@@ -10,6 +10,7 @@ library(effectsize)
 library(afex)      
 library(emmeans)
 library(broom)
+library(afex)
 
 # To compare between both visibility conditions without straight pieces
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_nan.csv"
