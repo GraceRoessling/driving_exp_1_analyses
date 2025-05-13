@@ -31,17 +31,21 @@ mean_values$condition <- factor(mean_values$condition,
                                 labels = c("Constant Track", "Variable Track"))
 
 within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = geom_point_size) +
+  geom_point(position=pd_for_within,size = 5) +
   geom_line(position=pd_for_within,size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
-  labs(x = "Trials", y = "Mean Speed (m/s)", color = "Track Constancy") +
+  labs(x = "Trials", y = "Mean Speed (m/s)", color = "Track Constancy", title = "Mean Speed Across Trials") +
   scale_x_discrete(labels = 1:10) +
-  #coord_fixed(ratio = 0.6)+
+  scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
   larger_text_theme(base_size = 12) +
-  theme(legend.position = "none")+
-  theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
-                           "inches")) 
-
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
+  )
 
 within_mean_speed_plot
 
@@ -72,7 +76,7 @@ within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color
   geom_point(position=pd_for_within,size = geom_point_size) +
   geom_line(position=pd_for_within, size=line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
-  labs(x = "Trials", y = "SD of Speed (m/s)", color = "Track Constancy") +
+  labs(x = "Trials", y = "SD of Speed ", color = "Track Constancy") +
   scale_x_discrete(labels = 1:10) +
   #coord_fixed(ratio = 2.7)+
   larger_text_theme(base_size = 12) +

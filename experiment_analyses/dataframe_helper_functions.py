@@ -219,7 +219,7 @@ def get_speed_per_frame(driving_vars_df):
 map_to_steering_angle = lambda input,input_start,input_end,output_start,output_end: output_start + ((output_end - output_start) / (input_end - input_start)) * (input - input_start)
 def convert_steering_value(driving_vars_df):
     input_start, input_end = -1, 1
-    output_start, output_end = -900, 900
+    output_start, output_end = -450, 450
     
     # take steering input and convert from -1 to 1 --> 0 --> 35 degrees
     steering_array = driving_vars_df['steering_angle'].tolist()

@@ -33,7 +33,6 @@ mean_lane_dev_cov.aov <- anova_test(
 mean_lane_cov_table <- get_anova_table(mean_lane_dev_cov.aov)
 
 
-
 # Analysis 8: Lane Deviation Variance with Lap Time Covariate ----------------------------------------------------------------
 
 main="SD of Lane Deviation for Repeated vs Varied Track Groups"

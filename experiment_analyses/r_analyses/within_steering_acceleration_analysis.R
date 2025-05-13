@@ -30,13 +30,20 @@ mean_values$condition <- factor(mean_values$condition,
 
 
 within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = geom_point_size) +
-  geom_line(position=pd_for_within, size = line_size) +
+  geom_point(position=pd_for_within,size = 5) +
+  geom_line(position=pd_for_within,size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
-  labs(x = "Trials", y = bquote("Mean Abs. Steering\nAcceleration ( deg/"~s^2~")"), color = "Track Constancy") +
+  labs(x = "Trials", y = bquote("Mean Abs. Steering Acceleration ( deg /"~s^2~")"), color = "Track Constancy", title = "Steering Acceleration Across Trials") +
   scale_x_discrete(labels = 1:10) +
-  larger_text_theme(base_size = 12)+
-  #coord_fixed(ratio = 0.4)+
-  theme(legend.position = "top")
+  scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
+  larger_text_theme(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
+  )
 
 within_steering_acceleration_plot
