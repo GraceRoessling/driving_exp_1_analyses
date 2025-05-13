@@ -1,0 +1,38 @@
+﻿This Python script analyzes driving experiment data using Dynamic Time Warping (DTW) to compare trajectories across subjects and track pieces, calculating normalized DTW costs and visualizing average costs for familiar and unfamiliar groups.
+Overview
+* Purpose: Compute DTW distances between Trial 10 and Trial 11 trajectories, normalize costs, and compare familiar vs. unfamiliar groups.
+* Output: Average costs per group and a bar plot.
+Prerequisites
+* Python: 3.8+
+* Packages: numpy, scipy, matplotlib, pandas
+pip install numpy scipy matplotlib pandas
+* Data: CSV files in a main_data folder, parsed by a preprocess module.
+Setup
+   1. Clone Repo:
+git clone <repository-url>
+cd <repository-directory>
+      2. Set Paths:
+      * experiment_analyses_dir: Path to experiment_analyses folder.
+experiment_analyses_dir = r"C:\path\to\experiment_analyses"
+      * SUBJECT_PATH: Path to main_data folder.
+SUBJECT_PATH = r"C:\path\to\main_data"
+         3. Ensure preprocess: Provide or implement the preprocess module to load data.
+Usage
+         * Run:
+python script_name.py
+         * Workflow:
+            * Loads data into subject_dict using preprocess.run.
+            * Computes DTW costs for trajectories (Trial 10 vs. 11) per subject and track piece.
+            * Normalizes costs and averages them for familiar (Constant Track) and unfamiliar (Variable Track) groups.
+            * Plots a bar chart (red: familiar, blue: unfamiliar).
+            * Groups:
+            * Familiar: 13 subjects (e.g., baggy, excludes wad).
+            * Unfamiliar: 12 subjects (e.g., atom).
+            * Track Pieces: 8 segments (e.g., chicane, spiral).
+Code Details
+            * DTW: getCostMatrix computes the optimal warping path and cost matrix using dynamic programming.
+            * Normalization: Final cost divided by matrix dimension product.
+            * Data: Trajectories are 2D pos_x, pos_z arrays.
+Results
+            * Outputs [familiar_cost, unfamiliar_cost].
+            * Displays a bar plot comparing group costs.
