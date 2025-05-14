@@ -220,6 +220,7 @@ map_to_steering_angle = lambda input,input_start,input_end,output_start,output_e
 def convert_steering_value(driving_vars_df):
     input_start, input_end = -1, 1
     output_start, output_end = -450, 450
+    #print("MAPPING HERE")
     
     # take steering input and convert from -1 to 1 --> 0 --> 35 degrees
     steering_array = driving_vars_df['steering_angle'].tolist()
@@ -281,7 +282,6 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
 
     # get total trial time
     whole_trial_driving_sim_df = trial.paths["Vehicle_DrivingSim"]
-    #print(whole_trial_driving_sim_df)
 
     if metric_type_as_string == "lap_time":
         entire_trial_first_time_step = whole_trial_driving_sim_df["time"].iloc[0]
@@ -289,10 +289,9 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
         entire_trial = entire_trial_last_time_step - entire_trial_first_time_step
 
     elif metric_type_as_string == "steering_acc":
-        #print("ENTIRE TRIAL =============================================")
         steering_accelerations = steering_acceleration_analysis.calculate_average_steering_acceleration(whole_trial_driving_sim_df)
         entire_trial = np.mean(steering_accelerations)
-        #print(entire_trial)
+
     # collapse the dictionary into a list
     all_track_pieces = map.pieces # list of pieces associated to a given map
 
@@ -300,7 +299,6 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
     for track_piece_id in all_track_pieces:
         track_piece_object = trial.pieces[track_piece_id]
         driving_sim_df = track_piece_object.dataframes["Vehicle_DrivingSim"]
-        #print(driving_sim_df)
         
         if metric_type_as_string == "lap_time":
             first_time_step = driving_sim_df["time"].iloc[0]
@@ -309,10 +307,8 @@ def get_lap_time_or_steering_ac_for_each_track_piece_for_one_trial(metric_type_a
             track_piece_dict[track_piece_id] = {"lap_time":total_lap_time}
         
         elif metric_type_as_string == "steering_acc":
-            #print(f"TRACK PIECE {track_piece_id} =============================================")
             piece_steering_accelerations = steering_acceleration_analysis.calculate_average_steering_acceleration(driving_sim_df)
             piece_steering_acc = np.mean(piece_steering_accelerations)
-            #print(piece_steering_acc)
             track_piece_dict[track_piece_id] = {"steering_acceleration":piece_steering_acc}
     return(entire_trial,track_piece_dict)
 

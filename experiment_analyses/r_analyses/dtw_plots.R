@@ -75,14 +75,17 @@ ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
   scale_fill_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040"), labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")) +
   labs(
     title = "Mean Segment Cost by Condition",
-    x = "Condition",
+    x = "Track Constancy",
     y = "Mean Segment Cost"
   ) +
-  theme_minimal() +
-  theme(
-    legend.position = "none"
+  theme(legend.position = "none",
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(size = 20),
+        axis.title.x = element_text(size = 30),
+        axis.title.y = element_text(size = 30),
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 30)
   )
-
 
 model <- aov(Segment.Costs ~ Condition * Segments + Error(subject_id/(Condition * Segments)), data = data)
 summary(model)
@@ -91,3 +94,4 @@ dtw.aov <- anova_test(
   data = data, dv = Segment.Costs, wid = subject_id,
   between = Condition, within = Segments,effect.size = "pes"
 )
+
