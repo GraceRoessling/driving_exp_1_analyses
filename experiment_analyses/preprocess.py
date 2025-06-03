@@ -10,8 +10,8 @@ import dataframe_helper_functions
 def initialize_subjects(dir_path):
     subject_obj_dict = dict()
     subj_id_with_conditions_dict = subject.Subject.subject_id_dict
-    familiar_id,unfamiliar_id = subj_id_with_conditions_dict.values()
-    all_subj_ids = familiar_id+unfamiliar_id
+    control, scrambled_segments, scrambled_landmarks = subj_id_with_conditions_dict.values()
+    all_subj_ids = control+scrambled_segments+scrambled_landmarks
     for subject_id in all_subj_ids:
         condition = (next(k for k, v in subj_id_with_conditions_dict.items() if subject_id in v))
         subject_object = subject.Subject(subject_id, condition,  dir_path)
@@ -58,7 +58,6 @@ def run(SUBJECT_PATH):
         initialize_trials_for_one_subject(subject_object)
         initialize_maps_and_pieces(subject_object)
     for subject_id in subject_dict:
-        #print(subject_dict[subject_id],"=============================================")
         subject_object = subject_dict[subject_id]
         subject_object.speed,subject_object.steering,subject_object.lap_time,subject_object.lane_dev,subject_object.steering_acceleration = dict(),dict(),dict(),dict(),dict()
         for i in range(0,11):
@@ -72,7 +71,6 @@ def run(SUBJECT_PATH):
             subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
             subject_object.lane_dev[i+1] = {f"trial_total":total_lane_dev_dict,f"trial_piece":track_piece_lane_dev_dict}
             subject_object.steering_acceleration[i+1] = {f"trial_total":entire_trial_steering_acc,f"trial_piece":track_piece_steering_acc_dict}
-            #print(subject_object.steering_acceleration[i+1])
     return(subject_dict)
 
 

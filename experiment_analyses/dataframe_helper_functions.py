@@ -9,15 +9,30 @@ from collections import defaultdict
 import os
 import steering_acceleration_analysis
 import trial
+import re
 
 
 # filter dataframes --------------------------------------------------------------------------
 
 def extract_map_number(filename):
-    match = re.search(r'(?i)map_(\d+)', filename)
-    if match:
-        return int(match.group(1))
-    return None  # Return None if no match is found
+    filename_lower = filename.lower()
+    
+    if 'control' in filename_lower or 'landmark' in filename_lower:
+        print("map 10")
+        return 10
+    elif 'ss' and 'trial_11' in filename_lower:
+        print("map 11")
+        return 11
+    elif 'ss' in filename_lower:
+        match = re.search(r'map_(\d+)', filename_lower)
+        if match:
+            print("map", int(match.group(1)))
+            return int(match.group(1))
+    elif 'trial_11' in filename_lower:
+        print("map 11")
+        return 11
+    print(filename_lower)
+    return None  # Return None if no conditions are met
 
 def clean_track_data(driving_vars_df,cam_position_df,vehicle_position_df):
     if "RESET" not in driving_vars_df["current_track_piece"].values:
@@ -244,7 +259,7 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
     elif metric_type_as_string == "steering":
         whole_trial_df_column = whole_trial_driving_sim_df["steering_angle"]
     elif metric_type_as_string == "lane_dev":
-        whole_trial_df_column = whole_trial_driving_sim_df["lane_deviation"]
+        whole_trial_df_column = whole_trial_driving_sim_df["lane_deviation_c"]
         #whole_trial_df_column = whole_trial_df_column.replace([np.inf, -np.inf], 0)
         whole_trial_df_column = whole_trial_df_column.abs()
 
@@ -265,7 +280,7 @@ def get_metrics_for_each_track_piece_for_one_trial(metric_type_as_string,trial,m
         elif metric_type_as_string == "steering":
             piece_df_column = driving_sim_df["steering_angle"]
         elif metric_type_as_string == "lane_dev":
-            piece_df_column =  driving_sim_df["lane_deviation"]
+            piece_df_column =  driving_sim_df["lane_deviation_c"]
             piece_df_column = piece_df_column - 2.5
             #piece_df_column = piece_df_column.abs()
         piece_mean = piece_df_column.mean()
