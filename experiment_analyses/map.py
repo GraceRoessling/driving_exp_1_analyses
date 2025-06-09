@@ -5,32 +5,32 @@ import os
 class Map:
     "This is the map class. A map is an environment that contains the track that the subject drives on. There is one map per trial."
     map_pieces_dict = {
-        "1" : {"high_visibility": ["long_straight","symmetric_parabolic","short_straight_1","traffic_circle","short_straight_2","triple_s","short_straight_3","chicane","short_straight_4","t_turn","short_straight_5","asymmetric_parabolic_2","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
-        "low_visibility": ["symmetric_parabolic"]},
+        "1" : {"high_visibility": ["long_straight","symmetric_parabolic","short_straight_1","short_straight_2","triple_s","short_straight_3","chicane","short_straight_4","t_turn","short_straight_5","asymmetric_parabolic_2","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
+        "low_visibility": ["traffic_circle"]},
 
-        "2": {"high_visibility": ["long_straight","spiral","short_straight_1","t_turn","short_straight_2","asymmetric_parabolic_2","short_straight_3","chicane","short_straight_4","symmetric_parabolic","short_straight_5","triple_s","short_straight_6","asymmetric_parabolic_1","short_straight_7","traffic_circle","short_straight_8"],
-        "low_visibility": ["asymmetric_parabolic_2"]},
-
-        "3" :{"high_visibility": ["long_straight","traffic_circle","short_straight_1","asymmetric_parabolic_2","short_straight_2","chicane","short_straight_3","triple_s","short_straight_4","t_turn","short_straight_5","asymmetric_parabolic_1","short_straight_6","spiral","short_straight_7","symmetric_parabolic","short_straight_8"],
-        "low_visibility": ["turn_3"]},
-
-        "4":{"high_visibility": ["long_straight","t_turn","short_straight_1","traffic_circle","short_straight_2","chicane","short_straight_3","triple_s","short_straight_4","asymmetric_parabolic_1","short_straight_5","spiral","short_straight_6","symmetric_parabolic","short_straight_7","asymmetric_parabolic_2","short_straight_8"],
+        "2": {"high_visibility": ["long_straight","spiral","short_straight_1","t_turn","short_straight_2","asymmetric_parabolic_2","short_straight_3","short_straight_4","symmetric_parabolic","short_straight_5","triple_s","short_straight_6","asymmetric_parabolic_1","short_straight_7","traffic_circle","short_straight_8"],
         "low_visibility": ["chicane"]},
 
-        "5": {"high_visibility": ["long_straight","t_turn","short_straight_1","triple_s","short_straight_2","chicane","short_straight_3","spiral","short_straight_4","symmetric_parabolic","short_straight_5","traffic_circle","short_straight_6","asymmetric_parabolic_2","short_straight_7","asymmetric_parabolic_1","short_straight_8"],
+        "3" :{"high_visibility": ["long_straight","traffic_circle","short_straight_1","short_straight_2","chicane","short_straight_3","triple_s","short_straight_4","t_turn","short_straight_5","asymmetric_parabolic_1","short_straight_6","spiral","short_straight_7","symmetric_parabolic","short_straight_8"],
+        "low_visibility": ["asymmetric_parabolic_2"]},
+
+        "4":{"high_visibility": ["long_straight","t_turn","short_straight_1","traffic_circle","short_straight_2","chicane","short_straight_3","triple_s","short_straight_4","asymmetric_parabolic_1","short_straight_5","short_straight_6","symmetric_parabolic","short_straight_7","asymmetric_parabolic_2","short_straight_8"],
         "low_visibility": ["spiral"]},
 
-        "6": {"high_visibility": ["long_straight","traffic_circle","short_straight_1","spiral","short_straight_2","asymmetric_parabolic_1","short_straight_3","asymmetric_parabolic_2","short_straight_4","symmetric_parabolic","short_straight_5","chicane","short_straight_6","triple_s","short_straight_7","t_turn","short_straight_8"],
+        "5": {"high_visibility": ["long_straight","t_turn","short_straight_1","triple_s","short_straight_2","chicane","short_straight_3","spiral","short_straight_4","symmetric_parabolic","short_straight_5","traffic_circle","short_straight_6","short_straight_7","asymmetric_parabolic_1","short_straight_8"],
         "low_visibility": ["asymmetric_parabolic_2"]},
 
-        "7": {"high_visibility": ["long_straight","symmetric_parabolic","short_straight_1","chicane","short_straight_2","traffic_circle","short_straight_3","asymmetric_parabolic_2","short_straight_4","t_turn","short_straight_5","triple_s","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
-        "low_visibility": ["symmetric_parabolic"]},
+        "6": {"high_visibility": ["long_straight","traffic_circle","short_straight_1","spiral","short_straight_2","asymmetric_parabolic_1","short_straight_3","asymmetric_parabolic_2","short_straight_4","symmetric_parabolic","short_straight_5","short_straight_6","triple_s","short_straight_7","t_turn","short_straight_8"],
+        "low_visibility": ["chicane"]},
 
-        "8": {"high_visibility": ["long_straight","asymmetric_parabolic_2","short_straight_1","chicane","short_straight_2","spiral","short_straight_3","t_turn","short_straight_4","triple_s","short_straight_5","asymmetric_parabolic_1","short_straight_6","traffic_circle","short_straight_7","symmetric_parabolic","short_straight_8"],
+        "7": {"high_visibility": ["long_straight","symmetric_parabolic","short_straight_1","chicane","short_straight_2","short_straight_3","asymmetric_parabolic_2","short_straight_4","t_turn","short_straight_5","triple_s","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
+        "low_visibility": ["traffic_circle"]},
+
+        "8": {"high_visibility": ["long_straight","asymmetric_parabolic_2","short_straight_1","chicane","short_straight_2","short_straight_3","t_turn","short_straight_4","triple_s","short_straight_5","asymmetric_parabolic_1","short_straight_6","traffic_circle","short_straight_7","symmetric_parabolic","short_straight_8"],
+        "low_visibility": ["spiral"]},
+
+        "9": {"high_visibility": ["long_straight","short_straight_1","t_turn","short_straight_2","traffic_circle","short_straight_3","chicane","short_straight_4","spiral","short_straight_5","symmetric_parabolic","short_straight_6","triple_s","short_straight_7","asymmetric_parabolic_1","short_straight_8"],
         "low_visibility": ["asymmetric_parabolic_2"]},
-
-        "9": {"high_visibility": ["long_straight","asymmetric_parabolic_2","short_straight_1","t_turn","short_straight_2","traffic_circle","short_straight_3","chicane","short_straight_4","spiral","short_straight_5","symmetric_parabolic","short_straight_6","triple_s","short_straight_7","asymmetric_parabolic_1","short_straight_8"],
-        "low_visibility": ["t_turn"]},
 
         "10": {"high_visibility": ["long_straight","chicane","short_straight_1","short_straight_2","short_straight_3","traffic_circle","short_straight_4","asymmetric_parabolic_2","short_straight_5","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
         "low_visibility": ["triple_s","symmetric_parabolic","t_turn"]},

@@ -18,20 +18,15 @@ def extract_map_number(filename):
     filename_lower = filename.lower()
     
     if 'control' in filename_lower or 'landmark' in filename_lower:
-        print("map 10")
         return 10
     elif 'ss' and 'trial_11' in filename_lower:
-        print("map 11")
         return 11
     elif 'ss' in filename_lower:
         match = re.search(r'map_(\d+)', filename_lower)
         if match:
-            print("map", int(match.group(1)))
             return int(match.group(1))
     elif 'trial_11' in filename_lower:
-        print("map 11")
         return 11
-    print(filename_lower)
     return None  # Return None if no conditions are met
 
 def clean_track_data(driving_vars_df,cam_position_df,vehicle_position_df):

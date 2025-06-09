@@ -70,7 +70,7 @@ def run(SUBJECT_PATH):
             subject_object.steering[i+1] = {f"trial_total":total_steering_dict,f"trial_piece":track_piece_steering_dict}
             subject_object.lap_time[i+1] = {f"trial_total":entire_trial_lap_time,f"trial_piece":track_piece_time_dict}
             subject_object.lane_dev[i+1] = {f"trial_total":total_lane_dev_dict,f"trial_piece":track_piece_lane_dev_dict}
-            subject_object.steering_acceleration[i+1] = {f"trial_total":entire_trial_steering_acc,f"trial_piece":track_piece_steering_acc_dict}
+            subject_object.steering_acceleration[i+1] = {f"trial_total":entire_trial_steering_acc,f"trial_piece":track_piece_steering_acc_dict}   
     return(subject_dict)
 
 
