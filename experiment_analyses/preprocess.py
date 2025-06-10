@@ -54,6 +54,7 @@ def initialize_maps_and_pieces(subject):
 def run(SUBJECT_PATH):
     subject_dict = initialize_subjects(SUBJECT_PATH)
     for subject_id in subject_dict:
+        #print(subject_id)
         subject_object = subject_dict[subject_id]
         initialize_trials_for_one_subject(subject_object)
         initialize_maps_and_pieces(subject_object)

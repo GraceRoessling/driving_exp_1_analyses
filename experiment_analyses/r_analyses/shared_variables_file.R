@@ -13,7 +13,7 @@ library(broom)
 library(afex)
 
 # To compare between both visibility conditions without straight pieces
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 3\\data\\main_analysis_pilot_data.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 3\\data\\main_analysis_11_subjects.csv"
 main_df = read.csv(csv_path,stringsAsFactors=TRUE)
 
 # Hepler functions --------------------------------------------
@@ -111,9 +111,11 @@ main_df <- convert_var_to_sd(main_df)
 #main_df <- main_df %>% select(-contains('total')) # if "total" is in the row, take it out
 
 
-# Main analysis : Separate into familiar and unfamiliar groups -----------------
-familiar_df <- main_df %>% filter(!grepl('unfamiliar', condition)) # if "unfamiliar" is in the row, take it out
-unfamiliar_df <- main_df %>% filter(grepl('unfamiliar', condition)) # if "unfamiliar" is in the row, put it in
+# Main analysis : Separate into the three experimental groups -----------------
+control_df <- main_df %>% filter(grepl("control", condition))
+scrambed_landmarks_df <- main_df %>% filter(grepl("scrambled_landmarks", condition))
+scrambed_segments_df <- main_df %>% filter(grepl("scrambled_segments", condition))
+
 sd_df <- main_df[ , grepl( "sd" , names( main_df ) ) ]
 mean_df <- main_df[ , grepl( "mean" , names( main_df ) ) ]
 
