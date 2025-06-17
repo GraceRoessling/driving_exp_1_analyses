@@ -71,9 +71,9 @@ mean_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_l
   ) +
   labs(
     x = "Visibility",
-    y = "mean of Lane Dev. (meters)",
+    y = "Mean of Lane Dev. (meters)",
     color = "Track Constancy",
-    title = "mean of Lane Dev. for Constant vs. Variable Track Groups"
+    title = "Mean of Lane Dev. for Constant vs. Variable Track Groups"
   ) +
   scale_x_discrete(labels = c("high_vis_mean_lane_dev_10" = "High", "low_vis_mean_lane_dev_10" = "Low"), expand = c(0, 0.1)) +
   scale_color_manual(

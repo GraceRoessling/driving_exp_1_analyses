@@ -1,8 +1,8 @@
 
-# Analysis 8: Mean Speed with Steering Acceleration Covariate ----------------------------------------------------------------
+# Analysis 8: Speed Variance with Steering Acceleration Covariate ----------------------------------------------------------------
 
 
-main="Mean Speed for Repeated vs Varied Track Groups"
+main="SD of Speed for Repeated vs Varied Track Groups"
 
 # Long format
 sd_speed_df <- main_df %>%
@@ -72,9 +72,9 @@ sd_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_speed_de
   ) +
   labs(
     x = "Visibility",
-    y = "sd Speed (m/s)",
+    y = "SD of Speed (m/s)",
     color = "Track Constancy",
-    title = "sd Speed for Constant vs. Variable Track Groups"
+    title = "SD of Speed for Constant vs. Variable Track Groups"
   ) +
   scale_x_discrete(labels = c("high_vis_sd_speed_10" = "High", "low_vis_sd_speed_10" = "Low"), expand = c(0, 0.1)) +
   scale_color_manual(
