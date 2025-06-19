@@ -75,13 +75,13 @@ mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = me
     x = "Visibility",
     y = bquote("Mean Steering Acc. ( deg / "~s^2~")"),
     color = "Track Constancy",
-    title = "Mean Steering Acc. for Constant vs. Variable Track Groups"
+    title = "Mean Steering Acc. for Control, SL, and SS groups"
   ) +
   scale_x_discrete(labels = c("high_vis_steering_acceleration_10" = "High", "low_vis_steering_acceleration_10" = "Low"), expand = c(0, 0.1)) +
   larger_text_theme(base_size = 12)+
   scale_color_manual(
     values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040","scrambled_segments" = "#00CD00"),
-    labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
+    labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   )+
   theme(
     legend.position = "none",

@@ -72,14 +72,14 @@ sd_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_speed_de
   ) +
   labs(
     x = "Visibility",
-    y = "sd Speed (m/s)",
+    y = "SD of Speed (m/s)",
     color = "Track Constancy",
-    title = "sd Speed for Constant vs. Variable Track Groups"
+    title = "SD of Speed for Control, SL, and SS Groups"
   ) +
   scale_x_discrete(labels = c("high_vis_sd_speed_10" = "High", "low_vis_sd_speed_10" = "Low"), expand = c(0, 0.1)) +
   scale_color_manual(
-    values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040"),
-    labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
+    values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040","scrambled_segments" = "#00CD00"),
+    labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   ) +
   theme(
     legend.position = "none",

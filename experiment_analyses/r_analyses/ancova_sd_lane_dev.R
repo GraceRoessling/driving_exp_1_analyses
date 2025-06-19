@@ -78,7 +78,7 @@ sd_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_lane_
   scale_x_discrete(labels = c("high_vis_sd_lane_dev_10" = "High", "low_vis_sd_lane_dev_10" = "Low"), expand = c(0, 0.1)) +
   scale_color_manual(
     values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040","scrambled_segments" = "#00CD00"),
-    labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
+    labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   ) +
   theme(
     legend.position = "none",

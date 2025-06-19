@@ -74,15 +74,15 @@ mean_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_spee
     x = "Visibility",
     y = "Mean Speed (m/s)",
     color = "Track Constancy",
-    title = "Mean Speed for Constant vs. Variable Track Groups"
+    title = "Mean Speed for Control, SS, and SL groups"
   ) +
   scale_x_discrete(labels = c("high_vis_mean_speed_10" = "High", "low_vis_mean_speed_10" = "Low"), expand = c(0, 0.1)) +
   scale_color_manual(
     values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040","scrambled_segments" = "#00CD00"),
-    labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
+    labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   ) +
   theme(
-    legend.position = "none",
+    legend.position = "top",
     plot.title = element_text(size = 40),
     axis.title.x = element_text(size = 40),
     axis.title.y = element_text(size = 40),

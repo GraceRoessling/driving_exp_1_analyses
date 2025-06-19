@@ -36,7 +36,6 @@ within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y 
   labs(x = "Trials", y = bquote("Mean Abs. Steering Acceleration ( deg /"~s^2~")"), color = "Track Constancy", title = "Steering Acceleration Across Trials") +
   scale_x_discrete(labels = 1:10) +
   scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
-  larger_text_theme(base_size = 12) +
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),

@@ -27,8 +27,8 @@ mean_values <- mean_values %>%
 
 # Modify condition labels
 mean_values$condition <- factor(mean_values$condition,
-                                levels = c("familiar", "unfamiliar"),
-                                labels = c("Constant Track", "Variable Track"))
+                                levels = c("control", "scrambled_segments", "scrambled_landmarks"),
+                                labels = c("Control Group", "SS Group", "SL Group"))
 
 within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
   geom_point(position=pd_for_within,size = 5) +
@@ -36,7 +36,6 @@ within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, col
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
   labs(x = "Trials", y = "Mean Speed (m/s)", color = "Track Constancy", title = "Mean Speed Across Trials") +
   scale_x_discrete(labels = 1:10) +
-  scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
   larger_text_theme(base_size = 12) +
   theme(
     legend.position = "none",
@@ -69,11 +68,11 @@ mean_values <- long_data %>%
 
 # Modify condition labels
 mean_values$condition <- factor(mean_values$condition,
-                                levels = c("familiar", "unfamiliar"),
-                                labels = c("Constant Track", "Variable Track"))
+                                levels = c("control", "scrambled_segments", "scrambled_landmarks"),
+                                labels = c("Control Group", "SS Group", "SL Group"))
 
 within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = geom_point_size) +
+  geom_point(position=pd_for_within,size = 5) +
   geom_line(position=pd_for_within, size=line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
   labs(x = "Trials", y = "SD of Speed ", color = "Track Constancy") +
