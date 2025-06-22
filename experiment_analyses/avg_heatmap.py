@@ -1,110 +1,118 @@
 import numpy as np
-import pandas as pd
-from scipy.spatial.distance import cdist
+from scipy.spatial import cKDTree
 from collections import defaultdict
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from matplotlib.collections import LineCollection
+import numpy as np
 
-def find_closest_trajectory_point(driver_positions, road_point):
+def get_speeds_along_centerline(track_centerline_x, track_centerline_y, speed_df, position_df):
     """
-    Find the closest point in a driver's trajectory to a road centerline point.
-    
-    Args:
-        driver_positions (np.array): Nx2 array of [x, y] positions over time
-        road_point (tuple): (x, y) coordinates of road centerline point
-        
+    Given centerline coordinates and subject trajectory data,
+    return a dictionary mapping each centerline index to the subject's speed
+    at the closest position in the trajectory.
+
+    Parameters:
+    - track_centerline_x: Series or array of x coordinates for centerline
+    - track_centerline_y: Series or array of y coordinates for centerline
+    - speed_df: DataFrame with columns ['velocity_magnitude', 'time']
+    - position_df: DataFrame with columns ['pos_x', 'pos_y', 'time']
+
     Returns:
-        int: Index of closest trajectory point
+    - Dictionary mapping centerline index to speed at closest trajectory point
     """
-    distances = cdist([road_point], driver_positions)[0]
-    return np.argmin(distances)
 
-def process_single_driver(driver_positions, driver_speeds, road_centerline_df):
+    centerline_coords = np.column_stack((track_centerline_x.values, track_centerline_y.values))
+    trajectory_coords = position_df[['pos_x', 'pos_y']].values
+    trajectory_times = position_df['time'].values
+
+    # Build spatial tree of trajectory positions
+    trajectory_tree = cKDTree(trajectory_coords)
+
+    # Find closest trajectory point for each centerline point
+    distances, indices = trajectory_tree.query(centerline_coords)
+
+    # Use those indices to find the corresponding times and look up speeds
+    closest_times = trajectory_times[indices]
+
+    # Interpolate the speed at those times using speed_df
+    speed_at_times = np.interp(closest_times, speed_df['time'], speed_df['velocity_magnitude'])
+
+    # Build dictionary mapping centerline index to speed
+    centerline_speed_dict = {idx: speed for idx, speed in enumerate(speed_at_times)}
+
+    return centerline_speed_dict
+
+def average_centerline_speeds(centerline_speed_dicts):
     """
-    Process a single driver's data to create speed-position associations.
-    
-    Args:
-        driver_positions (np.array): Nx2 array of [x, y] positions over time
-        driver_speeds (np.array): N-length array of speeds over time
-        road_centerline_df (pd.DataFrame): DataFrame with 'x' and 'y' columns
-        
+    Given a list of dictionaries (one per subject) mapping centerline indices to speeds,
+    compute the average speed at each centerline index across all subjects.
+
+    Parameters:
+    - centerline_speed_dicts: List of dicts, where each dict maps centerline index -> speed
+
     Returns:
-        list: List of tuples [(road_point_idx, speed), ...]
+    - Dictionary mapping centerline index to average speed across all subjects
     """
-    driver_speed_list = []
-    
-    for road_idx, row in road_centerline_df.iterrows():
-        road_point = (row['x'], row['y'])
-        
-        # Find closest trajectory point
-        closest_traj_idx = find_closest_trajectory_point(driver_positions, road_point)
-        
-        # Get speed at that time (with bounds checking)
-        if 0 <= closest_traj_idx < len(driver_speeds):
-            speed = driver_speeds[closest_traj_idx]
-        else:
-            speed = 0.0
-        
-        driver_speed_list.append((road_idx, speed))
-    
-    return driver_speed_list
+    aggregated_speeds = defaultdict(list)
 
-def calculate_mean_speeds_along_road(drivers_data, road_centerline_df):
+    # Collect speeds for each centerline index
+    for subject_dict in centerline_speed_dicts:
+        for idx, speed in subject_dict.items():
+            aggregated_speeds[idx].append(speed)
+
+    # Compute average speed at each index
+    averaged_speeds = {idx: np.mean(speeds) for idx, speeds in aggregated_speeds.items()}
+
+    return averaged_speeds
+
+
+def plot_centerline_speed_heatmap(track_centerline_x, track_centerline_y, average_speed_dict, trial_number):
     """
-    Calculate mean speeds across all drivers for each road point.
-    
-    Args:
-        drivers_data (list): List of dictionaries, each containing:
-                           {'positions': np.array, 'speeds': np.array}
-        road_centerline_df (pd.DataFrame): DataFrame with 'x' and 'y' columns
-        
-    Returns:
-        list: List of tuples [(road_point_idx, mean_speed), ...]
+    Plots a heatmap along the centerline using average speeds from multiple subjects.
+
+    Parameters:
+    - track_centerline_x: array-like x coordinates of centerline
+    - track_centerline_y: array-like y coordinates of centerline
+    - average_speed_dict: dict mapping centerline index to average speed
+    - trial_number: integer, used for labeling
     """
-    # Process each driver to get their speed associations
-    all_driver_speed_lists = []
-    
-    for driver_data in drivers_data:
-        driver_positions = driver_data['positions']
-        driver_speeds = driver_data['speeds']
-        
-        driver_speed_list = process_single_driver(
-            driver_positions, driver_speeds, road_centerline_df
-        )
-        all_driver_speed_lists.append(driver_speed_list)
-    
-    # Collect speeds for each road point across all drivers
-    road_point_speeds = defaultdict(list)
-    
-    for driver_speed_list in all_driver_speed_lists:
-        for road_idx, speed in driver_speed_list:
-            road_point_speeds[road_idx].append(speed)
-    
-    # Calculate mean speeds
-    mean_speed_list = []
-    for road_idx in sorted(road_point_speeds.keys()):
-        speeds = road_point_speeds[road_idx]
-        mean_speed = np.mean(speeds)
-        mean_speed_list.append((road_idx, mean_speed))
-    
-    return mean_speed_list
 
-# Example usage:
-"""
-# Your data structure should look like:
-drivers_data = [
-    {
-        'positions': np.array([[x1, y1], [x2, y2], ...]),  # Nx2 array
-        'speeds': np.array([speed1, speed2, ...])          # N-length array
-    },
-    # ... for each of your 15 drivers
-]
+    # Convert centerline coordinates to NumPy arrays
+    x_vals = np.array(track_centerline_x)
+    y_vals = np.array(track_centerline_y)
 
-road_centerline_df = pd.DataFrame({
-    'x': [x1, x2, x3, ...],
-    'y': [y1, y2, y3, ...]
-})
+    # Create line segments from centerline
+    segments = [
+        [[x_vals[i], y_vals[i]], [x_vals[i + 1], y_vals[i + 1]]]
+        for i in range(len(x_vals) - 1)
+    ]
 
-# Calculate mean speeds
-mean_speeds = calculate_mean_speeds_along_road(drivers_data, road_centerline_df)
+    # Get speed values from average_speed_dict
+    speed_values = np.array([average_speed_dict.get(i, 0) for i in range(len(x_vals) - 1)])
 
-# Result: [(0, avg_speed_at_point_0), (1, avg_speed_at_point_1), ...]
-"""
+    # Normalize speeds for color mapping
+    norm = plt.Normalize(vmin=0, vmax=30)
+    cmap = cm.get_cmap("coolwarm")
+
+    # Create LineCollection with average speeds
+    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=6)
+    lc.set_array(speed_values)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.add_collection(lc)
+    ax.plot(x_vals, y_vals, color='gray', linestyle='dotted', lw=1.5, alpha=0.5)  # optional reference line
+
+    # Add colorbar and labels
+    cbar = plt.colorbar(lc, ax=ax)
+    cbar.set_label("Average Speed (m/s)")
+
+    ax.autoscale()
+    ax.set_aspect('equal', 'box')
+    plt.title(f"Centerline Speed Heatmap - Trial {trial_number + 1}")
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
