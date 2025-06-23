@@ -67,7 +67,7 @@ def average_centerline_speeds(centerline_speed_dicts):
     return averaged_speeds
 
 
-def plot_centerline_speed_heatmap(track_centerline_x, track_centerline_y, average_speed_dict, trial_number):
+def plot_centerline_speed_heatmap(condition,track_centerline_x, track_centerline_y, average_speed_dict, trial_number):
     """
     Plots a heatmap along the centerline using average speeds from multiple subjects.
 
@@ -110,9 +110,10 @@ def plot_centerline_speed_heatmap(track_centerline_x, track_centerline_y, averag
 
     ax.autoscale()
     ax.set_aspect('equal', 'box')
-    plt.title(f"Centerline Speed Heatmap - Trial {trial_number + 1}")
-    plt.xlabel("X")
-    plt.ylabel("Y")
+    plt.title(f"Average Heatmap for {condition}")
+    plt.xticks([])  # Removes X-axis numbers
+    plt.yticks([])
     plt.grid(True)
     plt.tight_layout()
-    plt.show()
+    #plt.show()
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_g_heatmap.svg")
