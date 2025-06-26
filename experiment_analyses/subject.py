@@ -4,9 +4,9 @@ class Subject:
     "This is the subject class. A subject is a person object that has performance information affiliated to their driving behavior."
     
     subject_id_dict = {
-    "control": ["both","cheek", "desk","dingy","floss","pagan","slot", "snarl","spoof","tribe", "untie"],
-    "scrambled_segments": ["brave","comic", "crop", "dial","gave", "hump", "mud", "outer", "ozone", "relax", "salon"],
-    "scrambled_landmarks": ["chain","cloth", "disk","flip","grab","guy","jam","line","marry", "shred", "spoon"]
+    "control": ["agony","both","cargo","cheek","cub", "desk","dingy","fetch","final","floss","fried","mount","pagan","slot", "snarl","spoof","tribe", "untie","width","wish"],
+    "scrambled_segments": ["brave","comic", "crop", "dial","donor","even","gave", "hump","jury","mud", "outer", "ozone", "relax","riot", "salon","unit", "zebra"],
+    "scrambled_landmarks": ["arena","chain","cloth","crept", "disk","elm","flip","game","grab","grant","guy","jam","line","marry","ounce","river","roar","shred", "spoon"]
     }
 
     def __init__(self, id, condition, dir_path):

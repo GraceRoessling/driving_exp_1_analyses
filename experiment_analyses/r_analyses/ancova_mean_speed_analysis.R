@@ -76,19 +76,33 @@ mean_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_spee
     color = "Track Constancy",
     title = "Mean Speed for Control, SS, and SL groups"
   ) +
-  scale_x_discrete(labels = c("high_vis_mean_speed_10" = "High", "low_vis_mean_speed_10" = "Low"), expand = c(0, 0.1)) +
+  scale_x_discrete(
+    labels = c("high_vis_mean_speed_10" = "High", "low_vis_mean_speed_10" = "Low"),
+    expand = c(0, 0.1)
+  ) +
   scale_color_manual(
-    values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040","scrambled_segments" = "#00CD00"),
-    labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
+    values = c("control" = "#0000FF", "scrambled_landmarks" = "#FF4040", "scrambled_segments" = "#00CD00"),
+    labels = c(
+      "control" = "Control Group",
+      "scrambled_landmarks" = "Scrambled Landmarks",
+      "scrambled_segments" = "Scrambled Segments"
+    ),
+    guide = guide_legend(ncol = 1)  # Force vertical format
   ) +
   theme(
     legend.position = "top",
+    legend.title.align = 0,  # Left-align title
+    legend.text.align = 0,   # Left-align item labels
+    legend.direction = "vertical",  # Stack vertically
+    legend.box.just = "left",  # Align legend box left
     plot.title = element_text(size = 40),
     axis.title.x = element_text(size = 40),
     axis.title.y = element_text(size = 40),
     axis.text.x = element_text(size = 30),
     axis.text.y = element_text(size = 30)
   )
+
+
 
 
 # Display the plot
