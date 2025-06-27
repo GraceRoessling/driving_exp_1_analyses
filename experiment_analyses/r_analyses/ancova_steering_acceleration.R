@@ -86,10 +86,10 @@ mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = me
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 40),
-    axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 30),
-    axis.text.y = element_text(size = 30)
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20)
   )
   
 

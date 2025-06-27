@@ -13,7 +13,7 @@ library(broom)
 library(afex)
 
 # To compare between both visibility conditions without straight pieces
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 3\\data\\main_analysis_56_subjects.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 3\\data\\main_analysis_60_subjects.csv"
 main_df = read.csv(csv_path,stringsAsFactors=TRUE)
 
 # Hepler functions --------------------------------------------

@@ -25,8 +25,8 @@ mean_values <- mean_values %>%
 
 # Modify condition labels
 mean_values$condition <- factor(mean_values$condition,
-                                levels = c("familiar", "unfamiliar"),
-                                labels = c("Constant Track", "Variable Track"))
+                                levels = c("control", "scrambled_segments", "scrambled_landmarks"),
+                                labels = c("Control Group", "SS Group", "SL Group"))
 
 
 within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
@@ -34,15 +34,17 @@ within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y 
   geom_line(position=pd_for_within,size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
   labs(x = "Trials", y = bquote("Mean Abs. Steering Acceleration ( deg /"~s^2~")"), color = "Track Constancy", title = "Steering Acceleration Across Trials") +
-  scale_x_discrete(labels = 1:10) +
-  scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
+  scale_x_discrete(labels = 1:10)+
+  scale_color_manual(values = c("Control Group" = "#0000FF",
+                                "SL Group" = "#FF4040",
+                                "SS Group" = "#00CD00"))  +
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 40),
+    axis.title.x = element_text(size = 20),
     axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 30),
-    axis.text.y = element_text(size = 30)
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20)
   )
 
 within_steering_acceleration_plot

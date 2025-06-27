@@ -1,7 +1,7 @@
 library(ggplot2)
 library(tidyverse)
 
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_data.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 3\\data\\dtw_data2.csv"
 data = read.csv(csv_path,stringsAsFactors=TRUE)
 
 data$Segments <- factor(data$Segments, levels = c(
@@ -43,7 +43,7 @@ ggplot(data, aes(x = Segments, y = Segment.Costs, fill = Condition)) +
     position = position_dodge(width = 0.9),
     width = 0.2
   ) +
-  scale_fill_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
+  scale_fill_manual(values = c("control" = "#0000FF", "sl" = "#FF4040","ss" = "#00CD00")) +
   scale_x_discrete(labels = segment_labels) +
   labs(
     title = "Mean Segment Costs by Segment Type and Condition",
@@ -60,7 +60,7 @@ ggplot(data, aes(x = Segments, y = Segment.Costs, fill = Condition)) +
     axis.text.y = element_text(size = 30)
   )
 
-# Averaged into two groups
+# Averaged into three groups
 ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
   stat_summary(
     fun = mean,
@@ -72,7 +72,7 @@ ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
     geom = "errorbar",
     width = 0.2
   ) +
-  scale_fill_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040"), labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")) +
+  scale_fill_manual(values = c("control" = "#0000FF", "sl" = "#FF4040","ss" = "#00CD00"), labels = c("control" = "Control Group", "sl" = "Scrambled Landmarks Group", "ss" = "Scrambled Segments Group")) +
   labs(
     title = "Mean Segment Cost by Condition",
     x = "Track Constancy",

@@ -5,8 +5,8 @@ class Subject:
     
     subject_id_dict = {
     "control": ["agony","both","cargo","cheek","cub", "desk","dingy","fetch","final","floss","fried","mount","pagan","slot", "snarl","spoof","tribe", "untie","width","wish"],
-    "scrambled_segments": ["brave","comic", "crop", "dial","donor","even","gave", "hump","jury","mud", "outer", "ozone", "relax","riot", "salon","unit", "zebra"],
-    "scrambled_landmarks": ["arena","chain","cloth","crept", "disk","elm","flip","game","grab","grant","guy","jam","line","marry","ounce","river","roar","shred", "spoon"]
+    "scrambled_segments": ["brave","comic", "crop", "dial","donor","even","gave","gore","gray", "hump","jury","mud", "outer", "ozone", "relax","riot", "salon","unit", "upon", "zebra"],
+    "scrambled_landmarks": ["arena","chain","cloth","crept", "disk","elm","flask","flip","game","grab","grant","guy","jam","line","marry","ounce","river","roar","shred", "spoon"]
     }
 
     def __init__(self, id, condition, dir_path):
