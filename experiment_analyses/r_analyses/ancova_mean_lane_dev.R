@@ -63,7 +63,7 @@ adj_means_df <- adj_means_df %>%
 
 # Plot using ggplot
 mean_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_lane_devs, color = familiarity, group = familiarity)) +
-  geom_point(position = pd_for_main, size = 6) +
+  geom_point(position = pd_for_main, size = 8) +
   geom_line(position = pd_for_main, size = 1.4) +
   geom_errorbar(
     aes(ymin = confidence_interval_lower, ymax = confidence_interval_upper),

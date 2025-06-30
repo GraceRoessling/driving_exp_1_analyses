@@ -90,7 +90,7 @@ mean_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_spee
     guide = guide_legend(ncol = 1)  # Force vertical format
   ) +
   theme(
-    legend.position = "top",
+    legend.position = "none",
     legend.title.align = 0,  # Left-align title
     legend.text.align = 0,   # Left-align item labels
     legend.direction = "vertical",  # Stack vertically

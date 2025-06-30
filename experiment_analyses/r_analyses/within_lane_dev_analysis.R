@@ -30,10 +30,10 @@ mean_values$condition <- factor(mean_values$condition,
 
 
 within_mean_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = 5) +
+  geom_point(position=pd_for_within,size = 7) +
   geom_line(position=pd_for_within, size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
-  labs(x = "Trials", y = "Mean Abs. Lane \n Deviation (meters)", color = "Track Constancy") +
+  labs(x = "Trials", y = "Mean Lane Dev. (meters)", color = "Track Constancy") +
   scale_x_discrete(labels = 1:10) +
   scale_color_manual(values = c("Control Group" = "#0000FF",
                                 "SL Group" = "#FF4040",
@@ -42,10 +42,10 @@ within_mean_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color 
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20)
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 40),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
   )
 
 within_mean_ld_plot
@@ -75,10 +75,10 @@ mean_values$condition <- factor(mean_values$condition,
 
 
 within_sd_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position = pd_for_within, size = 5) +
+  geom_point(position = pd_for_within, size = 7) +
   geom_line(position = pd_for_within, size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2, position = pd_for_within) +
-  labs(x = "Trials", y = "SD of Abs. Lane Deviation (meters)", color = "Track Constancy", title = "SD of Lane Deviation Across Trials") +
+  labs(x = "Trials", y = "SD of Lane Dev. (meters)", color = "Track Constancy", title = "SD of Lane Deviation Across Trials") +
   scale_x_discrete(labels = 1:10) +
   scale_color_manual(values = c("Control Group" = "#0000FF",
                                 "SL Group" = "#FF4040",
@@ -87,10 +87,10 @@ within_sd_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = 
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20)
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 40),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
   )
 
 

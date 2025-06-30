@@ -31,7 +31,7 @@ mean_values$condition <- factor(mean_values$condition,
                                 labels = c("Control Group", "SS Group", "SL Group"))
 
 within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = 5) +
+  geom_point(position=pd_for_within,size = 7) +
   geom_line(position=pd_for_within,size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
   labs(x = "Trials", y = "Mean Speed (m/s)", color = "Track Constancy", title = "Mean Speed Across Trials") +
@@ -43,10 +43,10 @@ within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, col
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20)
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 40),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
   )
 
 within_mean_speed_plot
@@ -75,7 +75,7 @@ mean_values$condition <- factor(mean_values$condition,
                                 labels = c("Control Group", "SS Group", "SL Group"))
 
 within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = 5) +
+  geom_point(position=pd_for_within,size = 7) +
   geom_line(position=pd_for_within, size=line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
   labs(x = "Trials", y = "SD of Speed ", color = "Track Constancy") +
@@ -85,13 +85,15 @@ within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 20),
-    axis.title.y = element_text(size = 20),
-    axis.text.x = element_text(size = 20),
-    axis.text.y = element_text(size = 20)
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 40),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
   )
 
-within_mean_speed_plot #/ within_sd_speed_plot
+within_sd_speed_plot
+
+#within_mean_speed_plot / within_sd_speed_plot
 
 #(within_mean_speed_plot | within_sd_speed_plot) + 
 #  plot_layout(heights = c(1, 1)) +
