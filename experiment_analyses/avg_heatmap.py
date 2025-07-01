@@ -92,7 +92,7 @@ def plot_centerline_speed_heatmap(condition,track_centerline_x, track_centerline
     speed_values = np.array([average_speed_dict.get(i, 0) for i in range(len(x_vals) - 1)])
 
     # Normalize speeds for color mapping
-    norm = plt.Normalize(vmin=0, vmax=30)
+    norm = plt.Normalize(vmin=0, vmax=25)
     cmap = cm.get_cmap("coolwarm")
 
     # Create LineCollection with average speeds
