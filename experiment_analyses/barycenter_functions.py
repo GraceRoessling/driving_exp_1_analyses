@@ -83,6 +83,8 @@ def process_groups(familiar_group_ids,unfamiliar_group_ids,subject_dict, track_p
                 track_piece_trajectory_df = track_dataframe_dict["main_camera"][550:1350]
             elif subject_id == "swarm" and track_piece_id == "t_turn":
                 track_piece_trajectory_df = track_dataframe_dict["main_camera"][500:1150]
+            elif subject_id == "debt" and track_piece_id == "t_turn":
+                track_piece_trajectory_df = track_dataframe_dict["main_camera"][:450]
             elif subject_id == "grid" and track_piece_id == "t_turn":
                 track_piece_trajectory_df = track_dataframe_dict["main_camera"][350:1000]
             elif subject_id == "grid" and track_piece_id == "symmetric_parabolic":
@@ -153,30 +155,49 @@ def get_barycenter_per_group(condition, track_piece_object, group_trajectories, 
     # ---- Export ----
     output_path = f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_DBA_traj_scaled2.csv"
     pd.DataFrame(aligned_barycenter, columns=["X", "Z"]).to_csv(output_path, index=False)
-    
+
+
 def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
     plt.figure(figsize=(12, 8))
 
-    # Plot the DBA trajectory
-    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
-    dba_file_path = dir_path + f"/{condition}_{track_piece_object.id}_DBA_traj_scaled.csv"
-    dba_df = pd.read_csv(dba_file_path)
-    plt.plot(dba_df[0], dba_df[1], color='red', lw=4, label='Centerline')
-
-    # Plot all subject trajectories in red
+    # Plot all subject trajectories in gray
     for i, traj in enumerate(group_trajectories[0:12]):
-        plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray',label=f'Subject {i+1}', alpha=0.6)
+        if i == 0:
+            plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray', label='Trajectories', alpha=0.6)
+        else:
+            plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray', alpha=0.6)
 
     # Get the centerline for reference
     track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
-    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Centerline')
+    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
+
+    # Plot the DBA trajectory
+    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
+    dba_file_path = dir_path + f"/{condition}_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    dba_df = pd.read_csv(dba_file_path)
+    if condition == "Constant Track":
+        dba_color = "blue"
+    else:
+        dba_color = "red"
+    plt.plot(dba_df['X'], dba_df['Z'], color=dba_color, lw=4, label='Mean Trajectory')
+
 
     # Plotting labels
     plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
     plt.xlabel('X Position')
     plt.ylabel('Z Position')
+    
+    # Other Plotting params
+    ax = plt.gca()
+    ax.autoscale()
+    # if track_piece_object.id == 't_turn':
+    #     ax.set_xlim([230, 390])
+    #     ax.set_ylim([80, 175])
+    # elif track_piece_object.id == 'symmetric_parabolic':
+    #     ax.set_xlim([-120, -35])
+    #     ax.set_ylim([-5, 80])
     plt.grid(True)
     plt.tight_layout()
     plt.legend()
-    plt.show()
-    #plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories.svg")
+    # plt.show()
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories_and_dba.svg")
