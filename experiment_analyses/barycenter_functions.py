@@ -5,6 +5,7 @@ import pandas as pd
 from scipy.spatial.distance import cdist
 from scipy.spatial import procrustes
 from scipy.interpolate import interp1d
+import matplotlib.patheffects as pe
 
 
 def getCostMatrix(dist_mat):
@@ -176,11 +177,11 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
     dba_file_path = dir_path + f"/{condition}_{track_piece_object.id}_DBA_traj_scaled2.csv"
     dba_df = pd.read_csv(dba_file_path)
     if condition == "Constant Track":
-        dba_color = "blue"
+        dba_color = "royalblue"
     else:
         dba_color = "red"
-    plt.plot(dba_df['X'], dba_df['Z'], color=dba_color, lw=4, label='Mean Trajectory')
-
+    # plt.plot(dba_df['X'], dba_df['Z'], color=dba_color, lw=4, label='Mean Trajectory')
+    plt.plot(dba_df['X'], dba_df['Z'], color= dba_color, lw=4,label='Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
 
     # Plotting labels
     plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
@@ -200,7 +201,7 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
     plt.tight_layout()
     plt.legend()
     # plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories_and_dba.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories_and_dba_moded.svg")
 
 
 def plot_comp_of_barycenters(track_piece_object):
@@ -218,57 +219,9 @@ def plot_comp_of_barycenters(track_piece_object):
     constant_dba_df = pd.read_csv(constant_dba_file_path)
     variable_dba_df = pd.read_csv(variable_dba_file_path)
  
-    plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='blue', lw=4, label='Constant Track Group')
-    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4, label='Variable Track Group')
+    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='blue', lw=4, label='Constant Track Group')
+    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4, label='Variable Track Group')
 
-
-    # Plotting labels
-    plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
-    plt.xlabel('X Position')
-    plt.ylabel('Z Position')
-    
-    # Other Plotting params
-    ax = plt.gca()
-    ax.autoscale()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.legend()
-    #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_dba_comparison.svg")
-
-
-import matplotlib.pyplot as plt
-import pandas as pd
-import matplotlib.patheffects as pe
-
-def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfamiliar_group_trajectories, track_piece_object):
-    plt.figure(figsize=(12, 8))
-
-    # Plot all subject trajectories
-    for i, traj in enumerate(familiar_group_trajectories[0:12]):
-        if i == 0:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', label='Constant Track Group Trajectories', alpha=0.6)
-        else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', alpha=0.6)
-    
-    for i, traj in enumerate(unfamiliar_group_trajectories[0:12]):
-        if i == 0:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', label='Variable Track Group Trajectories', alpha=0.6)
-        else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.6)
-
-    # Get the centerline for reference
-    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
-    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
-
-    # Plot the DBA trajectory
-    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
-    constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
-    variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
-    
-    constant_dba_df = pd.read_csv(constant_dba_file_path)
-    variable_dba_df = pd.read_csv(variable_dba_file_path)
- 
     plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     
@@ -284,4 +237,50 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.tight_layout()
     plt.legend()
     #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_dba_comparison.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_dba_comparison_moded.svg")
+
+
+def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfamiliar_group_trajectories, track_piece_object):
+    plt.figure(figsize=(12, 8))
+
+    # Plot all subject trajectories  
+    for i, traj in enumerate(unfamiliar_group_trajectories[0:12]):
+        if i == 0:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', label='Variable Track Group Trajectories', alpha=0.6)
+        else:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.8)
+    
+    for i, traj in enumerate(familiar_group_trajectories[0:12]):
+        if i == 0:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', label='Constant Track Group Trajectories', alpha=0.6)
+        else:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', alpha=0.6)
+
+    # Get the centerline for reference
+    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
+    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
+
+    # Plot the DBA trajectory
+    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
+    constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    
+    constant_dba_df = pd.read_csv(constant_dba_file_path)
+    variable_dba_df = pd.read_csv(variable_dba_file_path)
+ 
+    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    
+    # Plotting labels
+    plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
+    plt.xlabel('X Position')
+    plt.ylabel('Z Position')
+    
+    # Other Plotting params
+    ax = plt.gca()
+    ax.autoscale()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.legend()
+    #plt.show()
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_traj_comparison.svg")
