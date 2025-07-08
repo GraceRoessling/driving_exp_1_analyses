@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def getCostMatrix(dist_mat):
     """
@@ -88,28 +89,7 @@ def process_groups(familiar_group_ids,unfamiliar_group_ids,subject_dict, track_p
                 unfamiliar_trajectories.append(track_piece_trajectory_df[['pos_x', 'pos_z']].values)
     return(familiar_trajectories,unfamiliar_trajectories)
 
-def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
-    plt.figure(figsize=(12, 8))
-
-    # Plot all subject trajectories in red
-    for i, traj in enumerate(group_trajectories[0:12]):
-        plt.plot(traj[:, 0], traj[:, 1], lw=3, label=f'Subject {i+1}', alpha=0.6)
-
-    # Get the centerline for reference
-    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
-    # Plot the centerline
-    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Centerline')
-
-    # Plotting labels
-    plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
-    plt.xlabel('X Position')
-    plt.ylabel('Z Position')
-    plt.grid(True)
-    plt.tight_layout()
-    plt.legend()
-    plt.show()
-
-def get_barycenter_per_group(group_trajectories, group_ids):
+def get_barycenter_per_group(condition,track_piece_object,group_trajectories,group_ids):
     initial_traj = group_trajectories[0] # this will be our initial trajectory that we start with and iteratively update
 
     for i in range(0, len(group_trajectories) - 1): # Go through each trajectory in this experimental group
@@ -120,7 +100,35 @@ def get_barycenter_per_group(group_trajectories, group_ids):
         for j in range(0, len(path)): # Traverses alignment path to index trajectories and generate points on the Barycenter Trajectory
             new_barycenter.append((initial_traj[path[j][0]] + group_trajectories[i + 1][path[j][1]])/2)
         initial_traj = new_barycenter
-        print(f'{group_ids[i]} updated Barycenter')
+        #print(f'{group_ids[i]} updated Barycenter')
         x, y = zip(*initial_traj)
-        plt.plot(x, y)
+        #plt.plot(x, y)
     dba_fam = new_barycenter
+    dba_fam = initial_traj
+
+    #x1, y1 = zip(*dba_fam) #fam unzip and plot
+    #plt.plot(x1, y1)
+    pd.DataFrame(dba_fam).to_csv(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_DBA_traj.csv")
+
+def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
+    plt.figure(figsize=(12, 8))
+
+    # Plot all subject trajectories in red
+    for i, traj in enumerate(group_trajectories[0:12]):
+        plt.plot(traj[:, 0], traj[:, 1], lw=3, color='gray',label=f'Subject {i+1}', alpha=0.6)
+
+    # Get the centerline for reference
+    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
+    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Centerline')
+
+    
+
+    # Plotting labels
+    plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
+    plt.xlabel('X Position')
+    plt.ylabel('Z Position')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
+    #plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories.svg")
