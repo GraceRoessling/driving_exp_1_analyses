@@ -60,21 +60,54 @@ def getCostMatrix(dist_mat):
     cost_mat = cost_mat[1:, 1:]
     return (path[::-1], cost_mat) # Return cost_mat and path
 
-def process_groups(familiar_group_ids,unfamiliar_group_ids,subject_dict):
+def process_groups(familiar_group_ids,unfamiliar_group_ids,subject_dict, track_piece_id):
     familiar_trajectories = []
     unfamiliar_trajectories = []
     for group in [familiar_group_ids, unfamiliar_group_ids]:
         for subject_id in group:
             # Get objects associated with a given subject and their trial
             subject_object = subject_dict[subject_id] 
-            trial_object_eleven = subject_object.trials[9]
-            
-            trial_df_eleven = trial_object_eleven.trajectory_df # Get trajectory data frame
+            trial_object_ten = subject_object.trials[9]
+            # Get trajectory for track segment of interest
+            track_piece_object_dict = trial_object_ten.pieces # dictionary that contains track_piece names and their associated track_piece_object instantiation
+            track_piece_object = track_piece_object_dict[track_piece_id] # get the track piece object associated to the track piece
+            # Get trajectory for a given piece
+            track_dataframe_dict = track_piece_object.dataframes
+            track_piece_trajectory_df = track_dataframe_dict["main_camera"]
+            if subject_id == "trial" and track_piece_id == "t_turn":
+                track_piece_trajectory_df = track_dataframe_dict["main_camera"][550:1350]
+            elif subject_id == "swarm" and track_piece_id == "t_turn":
+                track_piece_trajectory_df = track_dataframe_dict["main_camera"][500:1150]
+            elif subject_id == "grid" and track_piece_id == "t_turn":
+                track_piece_trajectory_df = track_dataframe_dict["main_camera"][350:1000]
+            elif subject_id == "grid" and track_piece_id == "symmetric_parabolic":
+                track_piece_trajectory_df = track_dataframe_dict["main_camera"][550:1200]
             if len(familiar_trajectories) != len(familiar_group_ids): # checks when to switch to other experimental group list
-                familiar_trajectories.append(trial_df_eleven[['pos_x', 'pos_z']].values) # converts dataframe to np values
+                familiar_trajectories.append(track_piece_trajectory_df[['pos_x', 'pos_z']].values) # converts dataframe to np values
             else:
-                unfamiliar_trajectories.append(trial_df_eleven[['pos_x', 'pos_z']].values)
+                unfamiliar_trajectories.append(track_piece_trajectory_df[['pos_x', 'pos_z']].values)
     return(familiar_trajectories,unfamiliar_trajectories)
+
+def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
+    plt.figure(figsize=(12, 8))
+
+    # Plot all subject trajectories in red
+    for i, traj in enumerate(group_trajectories[0:12]):
+        plt.plot(traj[:, 0], traj[:, 1], lw=3, label=f'Subject {i+1}', alpha=0.6)
+
+    # Get the centerline for reference
+    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
+    # Plot the centerline
+    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Centerline')
+
+    # Plotting labels
+    plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
+    plt.xlabel('X Position')
+    plt.ylabel('Z Position')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
 
 def get_barycenter_per_group(group_trajectories, group_ids):
     initial_traj = group_trajectories[0] # this will be our initial trajectory that we start with and iteratively update
