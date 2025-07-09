@@ -162,7 +162,7 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
     plt.figure(figsize=(12, 8))
 
     # Plot all subject trajectories in gray
-    for i, traj in enumerate(group_trajectories[0:12]):
+    for i, traj in enumerate(group_trajectories):
         if i == 0:
             plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray', label='Trajectories', alpha=0.6)
         else:
@@ -180,7 +180,6 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
         dba_color = "royalblue"
     else:
         dba_color = "red"
-    # plt.plot(dba_df['X'], dba_df['Z'], color=dba_color, lw=4, label='Mean Trajectory')
     plt.plot(dba_df['X'], dba_df['Z'], color= dba_color, lw=4,label='Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
 
     # Plotting labels
@@ -191,12 +190,6 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
     # Other Plotting params
     ax = plt.gca()
     ax.autoscale()
-    # if track_piece_object.id == 't_turn':
-    #     ax.set_xlim([230, 390])
-    #     ax.set_ylim([80, 175])
-    # elif track_piece_object.id == 'symmetric_parabolic':
-    #     ax.set_xlim([-120, -35])
-    #     ax.set_ylim([-5, 80])
     plt.grid(True)
     plt.tight_layout()
     plt.legend()
@@ -222,7 +215,7 @@ def plot_comp_of_barycenters(track_piece_object):
     # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='blue', lw=4, label='Constant Track Group')
     # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4, label='Variable Track Group')
 
-    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     
     # Plotting labels
@@ -244,17 +237,17 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.figure(figsize=(12, 8))
 
     # Plot all subject trajectories  
-    for i, traj in enumerate(unfamiliar_group_trajectories[0:12]):
+    for i, traj in enumerate(unfamiliar_group_trajectories):
         if i == 0:
             plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', label='Variable Track Group Trajectories', alpha=0.6)
         else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.8)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.6)
     
-    for i, traj in enumerate(familiar_group_trajectories[0:12]):
+    for i, traj in enumerate(familiar_group_trajectories):
         if i == 0:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', label='Constant Track Group Trajectories', alpha=0.6)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', label='Constant Track Group Trajectories', alpha=0.6)
         else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', alpha=0.6)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', alpha=0.6)
 
     # Get the centerline for reference
     track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
@@ -267,9 +260,10 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     
     constant_dba_df = pd.read_csv(constant_dba_file_path)
     variable_dba_df = pd.read_csv(variable_dba_file_path)
- 
-    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    
+    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    
     
     # Plotting labels
     plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
@@ -283,4 +277,4 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.tight_layout()
     plt.legend()
     #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_traj_comparison.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_traj_and_dba_comparison.svg")
