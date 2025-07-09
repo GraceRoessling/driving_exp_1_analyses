@@ -87,8 +87,24 @@ def process_groups(subject_dict,track_piece_id,group_ids):
             track_piece_object = track_piece_object_dict[track_piece_id] # get the track piece object associated to the track piece
             # Get trajectory for a given piece
             track_dataframe_dict = track_piece_object.dataframes
-            track_piece_trajectory_df = track_dataframe_dict["main_camera"]
-            trajectory_list.append(track_piece_trajectory_df[['pos_x', 'pos_z']].values)
+            track_camera_position_df = track_dataframe_dict["main_camera"]
+            if subject_id == "fetch" and track_piece_id == "symmetric_parabolic":
+                track_camera_position_df = track_dataframe_dict["main_camera"][650:1100]
+            if subject_id == "fetch" and track_piece_id == "t_turn":
+                track_camera_position_df = track_dataframe_dict["main_camera"][0:430]
+            if subject_id == "gave" and track_piece_id == "symmetric_parabolic":
+                track_camera_position_df = track_dataframe_dict["main_camera"][520:1120]
+            if subject_id == "gave" and track_piece_id == "t_turn":
+                track_camera_position_df = track_dataframe_dict["main_camera"][0:560]
+            if subject_id == "marry" and track_piece_id == "symmetric_parabolic":
+                track_camera_position_df = track_dataframe_dict["main_camera"][480:940]
+            if subject_id == "marry" and track_piece_id == "t_turn":
+                track_camera_position_df = track_dataframe_dict["main_camera"][0:490]
+            if subject_id == "jam" and track_piece_id == "symmetric_parabolic":
+                track_camera_position_df = track_dataframe_dict["main_camera"][420:930]
+            if subject_id == "jam" and track_piece_id == "t_turn":
+                track_camera_position_df = track_dataframe_dict["main_camera"][0:470]
+            trajectory_list.append(track_camera_position_df[['pos_x', 'pos_z']].values)
     return(group_dict)
 
 def procrustes_no_scaling(X, Y):
@@ -112,6 +128,34 @@ def procrustes_no_scaling(X, Y):
     # Apply rotation and translate back to original location
     Y_aligned = np.dot(Y0, R) + muX
     return Y_aligned
+
+def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
+    plt.figure(figsize=(12, 8))
+
+    # Plot all subject trajectories in gray
+    for i, traj in enumerate(group_trajectories):
+        if i == 0:
+            plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray', label='Trajectories', alpha=0.6)
+        else:
+            plt.plot(traj[:, 0], traj[:, 1], lw=2, color='gray', alpha=0.6)
+
+    # Get the centerline for reference
+    track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
+    plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
+
+    # Plotting labels
+    plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
+    plt.xlabel('X Position')
+    plt.ylabel('Z Position')
+    
+    # Other Plotting params
+    ax = plt.gca()
+    ax.autoscale()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
+    #plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories_and_dba_moded.svg")
 
 
 def resample_trajectory(traj, num_points=100):
@@ -153,7 +197,7 @@ def get_barycenter_per_group(condition, track_piece_object, group_trajectories, 
     pd.DataFrame(aligned_barycenter, columns=["X", "Z"]).to_csv(output_path, index=False)
 
 
-def plot_trajectories_for_group(condition,group_trajectories,track_piece_object):
+def plot_trajectories_for_group_with_dba(condition,group_trajectories,track_piece_object):
     plt.figure(figsize=(12, 8))
 
     # Plot all subject trajectories in gray
