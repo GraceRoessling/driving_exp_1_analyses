@@ -218,18 +218,18 @@ def plot_comp_of_barycenters(track_piece_object):
     plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
 
     # Plot the DBA trajectory
-    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_figures/"
-    constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
-    variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_analyses/"
+    control_dba_file_path = dir_path + f"/Control_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    sl_dba_file_path = dir_path + f"/Scrambled Landmarks_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    ss_dba_file_path = dir_path + f"/Scrambled Segments_{track_piece_object.id}_DBA_traj_scaled2.csv"
     
-    constant_dba_df = pd.read_csv(constant_dba_file_path)
-    variable_dba_df = pd.read_csv(variable_dba_file_path)
- 
-    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='blue', lw=4, label='Constant Track Group')
-    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4, label='Variable Track Group')
+    control_dba_df = pd.read_csv(control_dba_file_path)
+    sl_dba_df = pd.read_csv(sl_dba_file_path)
+    ss_dba_df = pd.read_csv(ss_dba_file_path)
 
-    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(control_dba_df['X'], control_dba_df['Z'], color='royalblue', lw=4,label='Control Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(ss_dba_df['X'], ss_dba_df['Z'], color='green',lw=4,label='Scrambled Segments Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(sl_dba_df['X'], sl_dba_df['Z'], color='red',lw=4,label='Scrambled Landmarks Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     
     # Plotting labels
     plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
@@ -243,40 +243,54 @@ def plot_comp_of_barycenters(track_piece_object):
     plt.tight_layout()
     plt.legend()
     #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_figures/{track_piece_object.id}_dba_comparison_moded.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_analyses/{track_piece_object.id}_dba_comparison_moded.svg")
 
 
-def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfamiliar_group_trajectories, track_piece_object):
+def plot_comp_of_barycenters_and_trajectories(group_dict, track_piece_object):
     plt.figure(figsize=(12, 8))
 
+    control_trajectories = group_dict["control"][1]
+    scrambled_segments_trajectories = group_dict["scrambled_segments"][1]
+    scrambled_landmarks_trajectories = group_dict["scrambled_landmarks"][1]
+
     # Plot all subject trajectories  
-    for i, traj in enumerate(unfamiliar_group_trajectories[0:12]):
+    for i, traj in enumerate(scrambled_segments_trajectories):
         if i == 0:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', label='Variable Track Group Trajectories', alpha=0.6)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='green', label='Scrambled Segments Group Trajectories', alpha=0.6)
         else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.8)
-    
-    for i, traj in enumerate(familiar_group_trajectories[0:12]):
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='green', alpha=0.6)
+
+    for i, traj in enumerate(scrambled_landmarks_trajectories):
         if i == 0:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', label='Constant Track Group Trajectories', alpha=0.6)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', label='Scrambled Landmarks Group Trajectories', alpha=0.6)
         else:
-            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='blue', alpha=0.6)
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='red', alpha=0.6)
+
+    for i, traj in enumerate(control_trajectories):
+        if i == 0:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', label='Control Group Trajectories', alpha=0.6)
+        else:
+            plt.plot(traj[:, 0], traj[:, 1], lw=1, color='royalblue', alpha=0.6)
+
 
     # Get the centerline for reference
     track_piece_center_x, track_piece_center_y = track_piece_object.centerline_df['x'],track_piece_object.centerline_df['y']
     plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
 
     # Plot the DBA trajectory
-    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_figures/"
-    constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
-    variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_analyses/"
+    control_dba_file_path = dir_path + f"/Control_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    sl_dba_file_path = dir_path + f"/Scrambled Landmarks_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    ss_dba_file_path = dir_path + f"/Scrambled Segments_{track_piece_object.id}_DBA_traj_scaled2.csv"
     
-    constant_dba_df = pd.read_csv(constant_dba_file_path)
-    variable_dba_df = pd.read_csv(variable_dba_file_path)
- 
-    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    
+    control_dba_df = pd.read_csv(control_dba_file_path)
+    sl_dba_df = pd.read_csv(sl_dba_file_path)
+    ss_dba_df = pd.read_csv(ss_dba_file_path)
+
+    plt.plot(control_dba_df['X'], control_dba_df['Z'], color='royalblue', lw=4,label='Control Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(ss_dba_df['X'], ss_dba_df['Z'], color='green',lw=4,label='Scrambled Segments Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(sl_dba_df['X'], sl_dba_df['Z'], color='red',lw=4,label='Scrambled Landmarks Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+
     # Plotting labels
     plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
     plt.xlabel('X Position')
@@ -289,7 +303,7 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.tight_layout()
     plt.legend()
     #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_figures/{track_piece_object.id}_traj_comparison.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/presentations/r_analyses/{track_piece_object.id}_traj_and_dba_comparison.svg")
 
 def plot_trajectories_for_all_group(group_dict,track_piece_object):
     plt.figure(figsize=(12, 8))
