@@ -65,8 +65,8 @@ adj_means_df <- adj_means_df %>%
 
 # Plot using ggplot
 mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_steering_accelerations, color = familiarity, group = familiarity)) +
-  geom_point(position = pd_for_main, size = 8) +
-  geom_line(position = pd_for_main, size = 1.4) +
+  geom_point(position = pd_for_main, size = 5) +
+  geom_line(position = pd_for_main, size = 1.25) +
   geom_errorbar(
     aes(ymin = confidence_interval_lower, ymax = confidence_interval_upper),
     width = 0.1, size = 1, alpha = 0.9, position = pd_for_main
@@ -86,10 +86,10 @@ mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = me
   theme(
     legend.position = "none",
     plot.title = element_text(size = 20),
-    axis.title.x = element_text(size = 40),
-    axis.title.y = element_text(size = 40),
-    axis.text.x = element_text(size = 30),
-    axis.text.y = element_text(size = 30)
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
+    axis.text.x = element_text(size = 20),
+    axis.text.y = element_text(size = 20)
   )
   
 

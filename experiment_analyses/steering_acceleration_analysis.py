@@ -10,12 +10,12 @@ def calculate_average_steering_acceleration(df):
         # Prepare data for differentiation
         time_series,steering_angle = df["time"].values,df["steering_angle"].values      # Get time and steering angle arrays
         time_diffs = np.diff(time_series) # Get delta T
-        steering_angle_smoothed = pd.Series(steering_angle).rolling(window=13,center=True).mean().values # Smooth steering angle
+        steering_angle_smoothed = pd.Series(steering_angle).rolling(window=30,center=True).mean().values # Smooth steering angle
 
         # Calculate steering rate (angular velocity)
         steering_rates = np.diff(steering_angle_smoothed) / time_diffs
         steering_rates = np.append(steering_rates, np.nan) # Pad to keep alignment with time series (same length)
-        steering_rate_smoothed = pd.Series(steering_rates).rolling(window=13,center=True).mean().values # Smooth the steering rates
+        steering_rate_smoothed = pd.Series(steering_rates).rolling(window=30,center=True).mean().values # Smooth the steering rates
         
         # Add padding/maintain alignment before last differentiation
         valid_rates = steering_rate_smoothed[:-1] # Remove the last nan from rolling window avg
@@ -23,7 +23,7 @@ def calculate_average_steering_acceleration(df):
         # Calculate steering acceleration
         steering_acceleration = np.diff(valid_rates) / time_diffs[1:] # Compute steering acceleration
         steering_acceleration = np.append(steering_acceleration, [np.nan, np.nan])  # Two padding values to match original size
-        steering_acceleration_smoothed = pd.Series(steering_acceleration).rolling(window=13,center=True).mean().abs() # Smooth and take absolute value
+        steering_acceleration_smoothed = pd.Series(steering_acceleration).rolling(window=30,center=True).mean().abs() # Smooth and take absolute value
 
         # plt.plot(time_series, steering_angle)
         # plt.plot(time_series, steering_angle_smoothed)
