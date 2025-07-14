@@ -20,7 +20,7 @@ segment_labels <- c(
   "Chicane",
   "Triple-S",
   "Symm. Parab.",
-  "Traffic Circle",
+  "Traffic Circ.",
   "Asym. Parab. 1",
   "T-Turn",
   "Asym. Parab. 2",
@@ -73,6 +73,7 @@ ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
     width = 0.2
   ) +
   scale_fill_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040"), labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")) +
+  scale_x_discrete(labels = c("familiar" = "Constant", "unfamiliar" = "Variable")) +
   labs(
     title = "Mean Segment Cost by Condition",
     x = "Track Constancy",
@@ -83,8 +84,8 @@ ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
         plot.title = element_text(size = 20),
         axis.title.x = element_text(size = 30),
         axis.title.y = element_text(size = 30),
-        axis.text.x = element_text(size = 20),
-        axis.text.y = element_text(size = 30)
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 20)
   )
 
 model <- aov(Segment.Costs ~ Condition * Segments + Error(subject_id/(Condition * Segments)), data = data)
