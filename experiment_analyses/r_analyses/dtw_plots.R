@@ -95,3 +95,12 @@ dtw.aov <- anova_test(
   between = Condition, within = Segments,effect.size = "pes"
 )
 
+mean_sd_costs <- data %>%
+  group_by(Condition) %>%
+  summarise(
+    mean_segment_cost = mean(Segment.Costs, na.rm = TRUE),
+    sd_segment_cost = sd(Segment.Costs, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+print(mean_sd_costs)
