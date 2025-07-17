@@ -70,6 +70,7 @@ def scored_drawing_summary(df1, df2, df3):
     # Flatten MultiIndex columns
     summary.columns = [' '.join(col).strip() for col in summary.columns]
     summary = summary.reset_index()
+    result_df.to_csv('C:/Users/graci/Dropbox/PAndA/Thesis Experiment 3/data/drawing_scores.csv', index=False)
     return result_df,summary
 
 
@@ -148,9 +149,9 @@ result_df,summary = scored_drawing_summary(rater_1_df, aligned_rater2_df, aligne
 # print(result_df)
 # print(summary)
 
-subject_df, condition_stats, t_test_result = compute_mean_segment_cost_per_subject(result_df)
+subject_df, condition_stats, anova_result = compute_mean_segment_cost_per_subject(result_df)
 print(subject_df)
 print(condition_stats)
-print(t_test_result)
+print(anova_result)
 
 plot_mean_scores_bar(summary)

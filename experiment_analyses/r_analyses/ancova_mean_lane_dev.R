@@ -72,7 +72,7 @@ mean_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_l
   labs(
     x = "Visibility",
     y = "Mean Lane Dev. (meters)",
-    color = "Track Constancy",
+    color = "Configuration Constancy",
     title = "Mean Lane Dev. for Constant vs. Variable Track Groups"
   ) +
   scale_x_discrete(labels = c("high_vis_mean_lane_dev_10" = "High", "low_vis_mean_lane_dev_10" = "Low"), expand = c(0, 0.1)) +
@@ -81,7 +81,7 @@ mean_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_l
     labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   ) +
   theme(
-    legend.position = "none",
+    legend.position = "top",
     plot.title = element_text(size = 30),
     axis.title.x = element_text(size = 30),
     axis.title.y = element_text(size = 30),
