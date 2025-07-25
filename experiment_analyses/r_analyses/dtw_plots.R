@@ -96,3 +96,55 @@ dtw.aov <- anova_test(
   between = Condition, within = Segments,effect.size = "pes"
 )
 
+
+#post hoc
+
+library(emmeans)
+library(dplyr)
+
+# Get estimated marginal means for Segments
+emm <- emmeans(model, ~ Segments)
+
+# Pairwise comparisons with Bonferroni correction, requesting confidence intervals
+pairwise_comparisons <- pairs(emm, adjust = "bonferroni")
+
+# Convert to data frame and include confidence intervals and p-values
+summary_comparisons <- summary(pairwise_comparisons, infer = c(TRUE, TRUE))
+
+# Check the names of the columns to know what is available
+print(names(summary_comparisons))
+
+# Usually the columns for confidence intervals are called "lower.CL" and "upper.CL"
+# Let's rename for easier use:
+summary_comparisons <- summary_comparisons %>%
+  rename(
+    conf.low = lower.CL,
+    conf.high = upper.CL
+  )
+
+# Now get means and SDs by segment
+segment_stats <- data %>%
+  group_by(Segments) %>%
+  summarise(
+    mean_cost = mean(Segment.Costs, na.rm = TRUE),
+    sd_cost = sd(Segment.Costs, na.rm = TRUE)
+  )
+
+# Extract segment names from contrast
+summary_comparisons <- summary_comparisons %>%
+  mutate(
+    Segment1 = sub(" -.*", "", contrast),
+    Segment2 = sub(".*- ", "", contrast)
+  )
+
+# Join means and SDs for each segment in the comparison
+sig_comparisons <- summary_comparisons %>%
+  filter(p.value < 0.05) %>%
+  left_join(segment_stats, by = c("Segment1" = "Segments")) %>%
+  rename(mean1 = mean_cost, sd1 = sd_cost) %>%
+  left_join(segment_stats, by = c("Segment2" = "Segments")) %>%
+  rename(mean2 = mean_cost, sd2 = sd_cost) %>%
+  select(Segment1, mean1, sd1, Segment2, mean2, sd2, estimate, conf.low, conf.high, p.value)
+
+print(sig_comparisons)
+
