@@ -26,6 +26,8 @@ pwc <- sd_lane_dev_df_2 %>%
     sd_lane_dev ~ condition, covariate = total_steering_acceleration_1, p.adjust.method = "bonferroni"
   )
 
+pwc %>%
+  select(visibility, group1, group2, conf.low, conf.high, p.adj)
 
 lp <- ggline(
   get_emmeans(pwc), x = "visibility", y = "emmean", 
@@ -92,3 +94,32 @@ sd_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_lane_
 
 # Display the plot
 sd_lane_dev_plot_ancova
+
+
+
+
+# posthoc report!
+
+
+
+library(emmeans)
+
+# Fit the ANCOVA model manually
+model <- lm(sd_lane_dev ~ condition * visibility + total_steering_acceleration_1, data = sd_lane_dev_df_2)
+
+# Get pairwise comparisons with CIs, within each visibility condition
+emm <- emmeans(model, pairwise ~ condition | visibility, cov.reduce = mean, adjust = "bonferroni")
+
+# View pairwise comparisons with 95% CIs
+summary(emm$contrasts)
+
+summary(emm$contrasts, infer = c(TRUE, TRUE))
+
+sd_lane_dev_df_2 %>%
+  filter(condition %in% c("control", "scrambled_landmarks")) %>%
+  group_by(condition) %>%
+  summarise(
+    mean_sd_lane_dev = mean(sd_lane_dev, na.rm = TRUE),
+    sd_sd_lane_dev = sd(sd_lane_dev, na.rm = TRUE),
+    n = n()
+  )
