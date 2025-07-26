@@ -47,3 +47,40 @@ within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y 
   )
 
 within_steering_acceleration_plot
+
+
+
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_steering_acceleration")) %>%
+  pivot_longer(
+    cols = starts_with("avg_steering_acceleration"),
+    names_to = "trial",
+    names_pattern = "avg_steering_acceleration_(\\d+)",  # Extract trial number
+    values_to = "steering_acceleration"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "steering_acceleration",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)

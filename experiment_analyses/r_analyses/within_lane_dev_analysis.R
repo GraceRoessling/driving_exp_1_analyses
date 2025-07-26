@@ -49,6 +49,42 @@ within_mean_ld_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color 
 within_mean_ld_plot
 
 
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_mean_lane_dev")) %>%
+  pivot_longer(
+    cols = starts_with("avg_mean_lane_dev"),
+    names_to = "trial",
+    names_pattern = "avg_mean_lane_dev_(\\d+)",  # Extract trial number
+    values_to = "mean_lane_dev"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "mean_lane_dev",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)
+
+
 # Within Standard Deviation of Lane Deviation -----------------------------------------------------------------
 sd_ld_columns <- grepl("avg_sd_lane_dev_|condition", colnames(main_df))
 sd_ld_filtered_df <- main_df[, sd_ld_columns]
@@ -97,3 +133,38 @@ within_sd_ld_plot
 (within_mean_ld_plot | within_sd_ld_plot) + 
   plot_layout(heights = c(1, 1)) 
 
+
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_sd_lane_dev")) %>%
+  pivot_longer(
+    cols = starts_with("avg_sd_lane_dev"),
+    names_to = "trial",
+    names_pattern = "avg_sd_lane_dev_(\\d+)",  # Extract trial number
+    values_to = "sd_lane_dev"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "sd_lane_dev",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)

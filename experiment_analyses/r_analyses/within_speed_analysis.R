@@ -50,6 +50,55 @@ within_mean_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, col
 within_mean_speed_plot
 
 
+
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_mean_speed")) %>%
+  pivot_longer(
+    cols = starts_with("avg_mean_speed"),
+    names_to = "trial",
+    names_pattern = "avg_mean_speed_(\\d+)",  # Extract trial number
+    values_to = "mean_speed"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "mean_speed",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)
+
+# --- Optional: Test simple effects or trend contrasts ---
+# e.g., Pairwise comparisons at each trial (if interaction is significant)
+emmeans(anova_result, ~ condition | trial) %>%
+  pairs(adjust = "bonferroni")
+
+
+
+
+
+
+
+
+
 # SD of Speed ------------------------------------------------------------------------------------
 sd_speed_columns <- grepl("avg_sd_speed|condition", colnames(main_df))
 sd_speed_df <- main_df[, sd_speed_columns]
@@ -93,4 +142,48 @@ within_sd_speed_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color
 
 (within_mean_speed_plot | within_sd_speed_plot) + 
   plot_layout(heights = c(1, 1)) 
+
+
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_sd_speed")) %>%
+  pivot_longer(
+    cols = starts_with("avg_sd_speed"),
+    names_to = "trial",
+    names_pattern = "avg_sd_speed_(\\d+)",  # Extract trial number
+    values_to = "sd_speed"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "sd_speed",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)
+
+# --- Optional: Test simple effects or trend contrasts ---
+# e.g., Pairwise comparisons at each trial (if interaction is significant)
+emmeans(anova_result, ~ condition | trial) %>%
+  pairs(adjust = "bonferroni")
+
+
+
 
