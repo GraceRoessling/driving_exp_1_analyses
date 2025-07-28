@@ -57,6 +57,8 @@ def scored_drawing_summary(df1, df2, df3):
     # Flatten MultiIndex columns
     summary.columns = [' '.join(col).strip() for col in summary.columns]
     summary = summary.reset_index()
+
+    result_df.to_csv('C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/drawing_scores.csv', index=False)  
     return result_df,summary
 
 
