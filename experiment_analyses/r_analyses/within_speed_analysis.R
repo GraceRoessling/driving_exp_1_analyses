@@ -92,6 +92,26 @@ emmeans(anova_result, ~ condition | trial) %>%
   pairs(adjust = "bonferroni")
 
 
+# --- Step 4: Linear Mixed Model (LMM) Analysis ---
+library(lme4)
+library(lmerTest)  # for p-values
+library(sjPlot)    # optional: for easy model summaries and plots
+
+# Convert trial to numeric for linear slope modeling
+long_data_anova <- long_data_anova %>%
+  mutate(trial_numeric = as.numeric(as.character(trial)))
+
+# Fit the model
+lmm_model <- lmer(mean_speed ~ trial_numeric * condition + (trial_numeric | subject_id), data = long_data_anova)
+
+# Model summary with fixed effects and p-values
+summary(lmm_model)
+
+# Optional: ANOVA-style table of fixed effects
+anova(lmm_model, type = 3)
+
+# Optional: Plot model estimates
+plot_model(lmm_model, type = "pred", terms = c("trial_numeric", "condition"))
 
 
 
