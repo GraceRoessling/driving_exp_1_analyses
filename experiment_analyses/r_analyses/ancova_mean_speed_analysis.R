@@ -93,4 +93,3 @@ mean_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_spee
 
 # Display the plot
 mean_speed_plot_ancova
-
