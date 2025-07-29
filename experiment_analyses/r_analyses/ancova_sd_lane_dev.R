@@ -99,27 +99,41 @@ sd_lane_dev_plot_ancova
 
 
 # posthoc report!
-
-
-
 library(emmeans)
+library(dplyr)
 
-# Fit the ANCOVA model manually
-model <- lm(sd_lane_dev ~ condition * visibility + total_steering_acceleration_1, data = sd_lane_dev_df_2)
+# Fit the ANCOVA model using the correct data and variable names
+model <- lm(sd_lane_dev ~ condition * visibility + total_steering_acceleration_1,
+            data = sd_lane_dev_df_2)
 
-# Get pairwise comparisons with CIs, within each visibility condition
-emm <- emmeans(model, pairwise ~ condition | visibility, cov.reduce = mean, adjust = "bonferroni")
+# Get estimated marginal means (adjusted for covariate)
+emm_results <- emmeans(model, ~ condition | visibility)
 
-# View pairwise comparisons with 95% CIs
-summary(emm$contrasts)
-
-summary(emm$contrasts, infer = c(TRUE, TRUE))
-
-sd_lane_dev_df_2 %>%
-  filter(condition %in% c("control", "scrambled_landmarks")) %>%
-  group_by(condition) %>%
-  summarise(
-    mean_sd_lane_dev = mean(sd_lane_dev, na.rm = TRUE),
-    sd_sd_lane_dev = sd(sd_lane_dev, na.rm = TRUE),
-    n = n()
+# Summarize with means, SEs, and 95% confidence intervals
+summary_df <- summary(emm_results, infer = c(TRUE, TRUE)) %>%
+  rename(
+    mean = emmean,
+    lower_ci = lower.CL,
+    upper_ci = upper.CL
+  ) %>%
+  mutate(
+    mean = round(mean, 2),
+    SE = round(SE, 2),
+    lower_ci = round(lower_ci, 2),
+    upper_ci = round(upper_ci, 2)
   )
+
+# Print APA-style table
+print(summary_df)
+
+# Post-hoc: Compare condition within each visibility level
+pwc_condition_by_visibility <- sd_lane_dev_df_2 %>% 
+  group_by(visibility) %>%
+  emmeans_test(
+    sd_lane_dev ~ condition, 
+    covariate = total_steering_acceleration_1,
+    p.adjust.method = "bonferroni"
+  )
+
+# Print to inspect significance of condition differences at each visibility level
+print(pwc_condition_by_visibility)
