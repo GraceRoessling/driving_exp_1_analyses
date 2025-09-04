@@ -8,6 +8,14 @@ class Subject:
     "unfamiliar": ["atom","blank", "brim", "chef", "clerk", "debt","filth", "grid", "lens", "limb", "most","proof","slimy", "swarm", "wok"]
     }
 
+    completion_seq_dict = { "grip":"familiar","swarm": "unfamiliar","five": "familiar","wok": "unfamiliar","mule": "familiar","grid": "unfamiliar",
+                            "polio": "familiar","atom": "unfamiliar","bash": "familiar","slimy": "unfamiliar","slept": "familiar","clerk": "unfamiliar",
+                            "boned": "familiar","debt": "unfamiliar","yeast": "familiar","most": "unfamiliar","cargo": "familiar","brim": "unfamiliar",
+                            "trial": "familiar","lens": "unfamiliar","baggy": "familiar","chef": "unfamiliar","slate": "familiar","limb": "unfamiliar",
+                            "rerun": "familiar","blank": "unfamiliar","judge": "familiar","filth": "unfamiliar","poker": "familiar","proof": "unfamiliar"
+                        } 
+
+
     def __init__(self, id, condition, dir_path):
         self.id = id
         self.condition = condition
