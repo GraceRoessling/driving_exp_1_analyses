@@ -8,7 +8,14 @@ rater_3_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/docum
 
 condition_column = ["constant", "constant","constant","constant","constant","variable","constant","constant","constant","constant","constant","variable","variable","constant","variable","constant","variable","variable","variable","constant","variable","constant","constant","variable","variable","variable","variable","variable","variable"]
 
-print(len(condition_column))
+completion_seq_dict = {     "grip":"familiar",      "swarm": "unfamiliar",  "five": "familiar",     "wok": "unfamiliar",    "mule": "familiar",     "grid": "unfamiliar",
+                            "polio": "familiar",    "atom": "unfamiliar",   "bash": "familiar",     "slimy": "unfamiliar",  "slept": "familiar",    "clerk": "unfamiliar",
+                            "boned": "familiar",    "debt": "unfamiliar",   "yeast": "familiar",    "most": "unfamiliar",   "cargo": "familiar",    "brim": "unfamiliar",
+                            "trial": "familiar",    "lens": "unfamiliar",   "baggy": "familiar",    "chef": "unfamiliar",   "slate": "familiar",    "limb": "unfamiliar",
+                            "rerun": "familiar",    "blank": "unfamiliar",  "judge": "familiar",    "filth": "unfamiliar",  "poker": "familiar",    "proof": "unfamiliar"
+                        } 
+id_ordered_list = list(completion_seq_dict.keys()) # remove brim, the one subject who didn't complete post-test 2 or 3...
+id_ordered_list.remove("brim")
 
 def scored_drawing_summary(df1, df2, df3):
     """
@@ -47,6 +54,7 @@ def scored_drawing_summary(df1, df2, df3):
     result_df = result_df.sort_values(by="Normalized Score", ascending=False).reset_index(drop=True)
 
     result_df["Condition"] = condition_column
+    result_df["id"] = id_ordered_list
 
     summary = result_df.groupby("Condition").agg({
         "Score": ['mean', 'std'],

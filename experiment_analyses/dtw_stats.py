@@ -2,8 +2,6 @@ import pandas as pd
 
 dtw_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/dtw_data.csv")
 
-import pandas as pd
-
 def compute_mean_segment_cost_per_subject(df):
     # Group by subject_id and calculate the mean segment cost
     mean_costs = df.groupby('subject_id')['Segment Costs'].mean().reset_index()
@@ -26,5 +24,6 @@ def compute_mean_segment_cost_per_subject(df):
 
 
 new_df,group_means = compute_mean_segment_cost_per_subject(dtw_df)
+new_df.to_csv('C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/dtw_per_subj.csv', index=False)
 print(new_df)
 print(group_means)
