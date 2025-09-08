@@ -8,6 +8,8 @@ rater_3_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/docum
 
 condition_column = ["constant", "constant","constant","constant","constant","variable","constant","constant","constant","constant","constant","variable","variable","constant","variable","constant","variable","variable","variable","constant","variable","constant","constant","variable","variable","variable","variable","variable","variable"]
 
+map_selection_column = ["N", "N", "C", "N", "C", "C", "C", "C", "N", "C", "N", "C", "N", "C", "C", "N", "C", "C", "N", "C", "N", "C", "N", "C", "C", "C", "N", "N", "N"]
+
 completion_seq_dict = {     "grip":"familiar",      "swarm": "unfamiliar",  "five": "familiar",     "wok": "unfamiliar",    "mule": "familiar",     "grid": "unfamiliar",
                             "polio": "familiar",    "atom": "unfamiliar",   "bash": "familiar",     "slimy": "unfamiliar",  "slept": "familiar",    "clerk": "unfamiliar",
                             "boned": "familiar",    "debt": "unfamiliar",   "yeast": "familiar",    "most": "unfamiliar",   "cargo": "familiar",    "brim": "unfamiliar",
@@ -55,6 +57,7 @@ def scored_drawing_summary(df1, df2, df3):
 
     result_df["Condition"] = condition_column
     result_df["id"] = id_ordered_list
+    result_df["map_selection_answer"] = map_selection_column
 
     summary = result_df.groupby("Condition").agg({
         "Score": ['mean', 'std'],
