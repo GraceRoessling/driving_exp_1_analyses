@@ -6,18 +6,17 @@ rater_1_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/docum
 rater_2_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/MC_rater_sheet.csv")
 rater_3_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/TT_rater_sheet.csv")
 
-condition_column = ["constant", "constant","constant","constant","constant","variable","constant","constant","constant","constant","constant","variable","variable","constant","variable","constant","variable","variable","variable","constant","variable","constant","constant","variable","variable","variable","variable","variable","variable"]
+condition_column = ["constant", "constant","constant","constant","constant","variable","constant","constant","constant","constant","constant","variable","variable","constant","variable",
+                    "constant","variable","variable","variable","constant","variable","constant","constant","variable","variable","variable","variable","variable","variable"]
 
-map_selection_column = ["N", "N", "C", "N", "C", "C", "C", "C", "N", "C", "N", "C", "N", "C", "C", "N", "C", "C", "N", "C", "N", "C", "N", "C", "C", "C", "N", "N", "N"]
+map_selection_column = ["correct","correct","correct","correct","incorrect","correct","correct","correct","incorrect","correct","correct","incorrect","incorrect","correct","correct",
+                        "incorrect","correct","incorrect","incorrect","incorrect","incorrect","correct","incorrect","incorrect","correct","incorrect","incorrect","incorrect","incorrect"]
+                        
+ranked_to_order_list = [16,29,3,21,10,18,8,25,23,15,20,19,9,6,7,26,4,22,13,2,12,1,24,11,17,14,28,5,27]
 
-completion_seq_dict = {     "grip":"familiar",      "swarm": "unfamiliar",  "five": "familiar",     "wok": "unfamiliar",    "mule": "familiar",     "grid": "unfamiliar",
-                            "polio": "familiar",    "atom": "unfamiliar",   "bash": "familiar",     "slimy": "unfamiliar",  "slept": "familiar",    "clerk": "unfamiliar",
-                            "boned": "familiar",    "debt": "unfamiliar",   "yeast": "familiar",    "most": "unfamiliar",   "cargo": "familiar",    "brim": "unfamiliar",
-                            "trial": "familiar",    "lens": "unfamiliar",   "baggy": "familiar",    "chef": "unfamiliar",   "slate": "familiar",    "limb": "unfamiliar",
-                            "rerun": "familiar",    "blank": "unfamiliar",  "judge": "familiar",    "filth": "unfamiliar",  "poker": "familiar",    "proof": "unfamiliar"
-                        } 
-id_ordered_list = list(completion_seq_dict.keys()) # remove brim, the one subject who didn't complete post-test 2 or 3...
-id_ordered_list.remove("brim")
+id_list_ranked =   ['boned', 'proof', 'five', 'baggy', 'bash', 'cargo', 'polio', 'rerun', 'slate', 'yeast', 'trial', 'cargo', 'bash', 'grid', 'mule', 
+             'judge',   'wok', 'chef', 'slept', 'swarm', 'clerk', 'grip',  'limb', 'slimy',  'most',  'debt', 'poker', 'atom', 'filth']
+                    
 
 def scored_drawing_summary(df1, df2, df3):
     """
@@ -56,7 +55,7 @@ def scored_drawing_summary(df1, df2, df3):
     result_df = result_df.sort_values(by="Normalized Score", ascending=False).reset_index(drop=True)
 
     result_df["Condition"] = condition_column
-    result_df["id"] = id_ordered_list
+    result_df["id"] = id_list_ranked
     result_df["map_selection_answer"] = map_selection_column
 
     summary = result_df.groupby("Condition").agg({
