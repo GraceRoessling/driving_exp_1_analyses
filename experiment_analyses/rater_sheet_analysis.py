@@ -9,7 +9,41 @@ rater_2_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/docum
 rater_3_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/TT_rater_sheet.csv")
 
 # Need to get map selection column, ID, and condition
-master_dict = subject.completion_seq_with_ans_nested_dict
+nested_dict = subject.Subject.completion_seq_with_ans_nested_dict
+
+def merge_dict_with_scores(nested_dict, df_scores):
+    """
+    Merge a nested dictionary of subject metadata with a dataframe of drawing scores.
+    
+    Parameters
+    ----------
+    nested_dict : dict
+        A dictionary where keys are subject IDs and values are dictionaries containing
+        at least {"condition", "drawing_id", "map_selection"}.
+    df_scores : pd.DataFrame
+        DataFrame with columns ["drawing_id", "drawing_score"].
+    
+    Returns
+    -------
+    pd.DataFrame
+        Combined dataframe with columns:
+        ["subject_id", "condition", "drawing_id", "drawing_score", "map_selection"]
+    """
+    
+    # Convert nested dict into a dataframe
+    df_dict = pd.DataFrame.from_dict(nested_dict, orient="index").reset_index()
+    df_dict = df_dict.rename(columns={"index": "subject_id"})
+    
+
+    # Merge on drawing_id
+    df_scores = df_scores.rename(columns={"Drawing ID": "drawing_id"})
+    
+    df_merged = pd.merge(df_dict, df_scores, on="drawing_id", how="left")
+    
+    # Keep only desired columns (drop order, etc. if not needed)
+    df_final = df_merged[["subject_id", "condition", "drawing_id",'Normalized Score', 'Score', 'Score Std', "map_selection"]]
+    
+    return df_final
 
 def scored_drawing_summary(df1, df2, df3):
     """
@@ -48,9 +82,12 @@ def scored_drawing_summary(df1, df2, df3):
     result_df = result_df.sort_values(by="Normalized Score", ascending=False).reset_index(drop=True)
 
     # add columns to indicate the subject id, condition, and map selection answer based on the drawing_id
-    
+    result_df = merge_dict_with_scores(nested_dict, result_df)
+    result_df = result_df.sort_values(by="Normalized Score", ascending=False).reset_index(drop=True)
 
-    summary = result_df.groupby("Condition").agg({
+    print(result_df)
+
+    summary = result_df.groupby("condition").agg({
         "Score": ['mean', 'std'],
         "Normalized Score": ['mean', 'std'],
         "Score Std": ['mean', 'std']
@@ -59,32 +96,31 @@ def scored_drawing_summary(df1, df2, df3):
     # Flatten MultiIndex columns
     summary.columns = [' '.join(col).strip() for col in summary.columns]
     summary = summary.reset_index()
-    print(result_df)
     result_df.to_csv('C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/drawing_scores.csv', index=False)  
     return result_df,summary
 
 
 def compute_mean_segment_cost_per_subject(df):
     # Group by subject_id and calculate the mean segment cost
-    mean_costs = df.groupby('Drawing ID')['Score'].mean().reset_index()
+    mean_costs = df.groupby('drawing_id')['Score'].mean().reset_index()
     mean_costs.rename(columns={'Segment Costs': 'Mean Segment Cost'}, inplace=True)
 
     # Get the condition per subject_id (assuming one condition per subject)
-    conditions = df[['Drawing ID', 'Condition']].drop_duplicates()
+    conditions = df[['drawing_id', 'condition']].drop_duplicates()
 
     # Merge mean costs with condition info
-    result = pd.merge(mean_costs, conditions, on='Drawing ID')
+    result = pd.merge(mean_costs, conditions, on='drawing_id')
 
     # Sort so that 'familiar' condition comes first
-    result['Condition'] = pd.Categorical(result['Condition'], categories=['constant', 'variable'], ordered=True)
-    result = result.sort_values('Condition').reset_index(drop=True)
+    result['condition'] = pd.Categorical(result['condition'], categories=['familiar', 'unfamiliar'], ordered=True)
+    result = result.sort_values('condition').reset_index(drop=True)
 
     # Calculate mean and std deviation for each condition group
-    group_stats = result.groupby('Condition')['Score'].agg(['mean', 'std']).to_dict('index')
+    group_stats = result.groupby('condition')['Score'].agg(['mean', 'std']).to_dict('index')
 
     # Split data for t-test
-    familiar_data = result[result['Condition'] == 'constant']['Score']
-    unfamiliar_data = result[result['Condition'] == 'variable']['Score']
+    familiar_data = result[result['condition'] == 'familiar']['Score']
+    unfamiliar_data = result[result['condition'] == 'unfamiliar']['Score']
 
     # Independent samples t-test (assumes unequal variances by default with 'equal_var=False')
     t_stat, p_value = ttest_ind(familiar_data, unfamiliar_data, equal_var=False)
@@ -105,11 +141,11 @@ def plot_mean_scores_bar(summary_df):
     summary_df (pd.DataFrame): The summary dataframe output from scored_drawing_summary.
     """
     # Map to capitalized labels for clarity
-    condition_map = {"constant": "Constant", "variable": "Variable"}
-    summary_df["Condition"] = summary_df["Condition"].map(condition_map)
+    condition_map = {"familiar": "Constant", "unfamiliar": "Variable"}
+    summary_df["condition"] = summary_df["condition"].map(condition_map)
 
     # Extract means and stds
-    conditions = summary_df["Condition"]
+    conditions = summary_df["condition"]
     means = summary_df["Normalized Score mean"]
     stds = summary_df["Normalized Score std"]
 
@@ -121,7 +157,7 @@ def plot_mean_scores_bar(summary_df):
     bars = ax.bar(conditions, means, yerr=stds, capsize=5, color=colors)
 
     # Aesthetics
-    ax.set_xlabel('Condition')
+    ax.set_xlabel('condition')
     ax.set_ylabel('Mean Accuracy Score')
     ax.set_ylim(0, 1)
     ax.bar_label(bars, fmt='%.2f', padding=3)
