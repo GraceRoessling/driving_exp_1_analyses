@@ -1,22 +1,15 @@
 import pandas as pd
 from scipy.stats import ttest_ind
 import matplotlib.pyplot as plt
+import subject
 
+# Upload the csv files of the three raters
 rater_1_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/JH_rater_sheet.csv")
 rater_2_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/MC_rater_sheet.csv")
 rater_3_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/documentation/TT_rater_sheet.csv")
 
-condition_column = ["constant", "constant","constant","constant","constant","variable","constant","constant","constant","constant","constant","variable","variable","constant","variable",
-                    "constant","variable","variable","variable","constant","variable","constant","constant","variable","variable","variable","variable","variable","variable"]
-
-map_selection_column = ["correct","correct","correct","correct","incorrect","correct","correct","correct","incorrect","correct","correct","incorrect","incorrect","correct","correct",
-                        "incorrect","correct","incorrect","incorrect","incorrect","incorrect","correct","incorrect","incorrect","correct","incorrect","incorrect","incorrect","incorrect"]
-                        
-ranked_to_order_list = [16,29,3,21,10,18,8,25,23,15,20,19,9,6,7,26,4,22,13,2,12,1,24,11,17,14,28,5,27]
-
-id_list_ranked =   ['boned', 'proof', 'five', 'baggy', 'bash', 'cargo', 'polio', 'rerun', 'slate', 'yeast', 'trial', 'cargo', 'bash', 'grid', 'mule', 
-             'judge',   'wok', 'chef', 'slept', 'swarm', 'clerk', 'grip',  'limb', 'slimy',  'most',  'debt', 'poker', 'atom', 'filth']
-                    
+# Need to get map selection column, ID, and condition
+master_dict = subject.completion_seq_with_ans_nested_dict
 
 def scored_drawing_summary(df1, df2, df3):
     """
@@ -54,9 +47,8 @@ def scored_drawing_summary(df1, df2, df3):
     result_df = averaged_df[["Drawing ID", "Score", "Normalized Score", "Score Std"]]
     result_df = result_df.sort_values(by="Normalized Score", ascending=False).reset_index(drop=True)
 
-    result_df["Condition"] = condition_column
-    result_df["id"] = id_list_ranked
-    result_df["map_selection_answer"] = map_selection_column
+    # add columns to indicate the subject id, condition, and map selection answer based on the drawing_id
+    
 
     summary = result_df.groupby("Condition").agg({
         "Score": ['mean', 'std'],
@@ -67,7 +59,7 @@ def scored_drawing_summary(df1, df2, df3):
     # Flatten MultiIndex columns
     summary.columns = [' '.join(col).strip() for col in summary.columns]
     summary = summary.reset_index()
-
+    print(result_df)
     result_df.to_csv('C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/drawing_scores.csv', index=False)  
     return result_df,summary
 
