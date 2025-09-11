@@ -18,14 +18,20 @@ cat(sprintf("The regression model accounted for %.2f%% of the variance in low vi
 
 # 4. Plot the data and line of best fit
 plot <- ggplot(data, aes(x = Normalized_Drawing_Score, y = low_vis_var_lane_dev_10)) +
-  geom_point(color = "blue", size = 2) +   # scatter plot points
+  geom_point(color = "black", size = 2) +   # scatter plot points
   geom_smooth(method = "lm", color = "red", se = TRUE) +  # line of best fit with confidence interval
   labs(
-    title = "Linear Regression: Normalized Drawing Score vs. Low Visibility Lane Deviation",
     x = "Normalized Drawing Score",
-    y = "Low Visibility, Variability in Lane Deviation in Trial 10"
+    y = "SD of Lane Dev. in Low Vis. (meters)"
   ) +
-  theme_minimal()
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 20),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15)
+  )
 
 # Show plot
 print(plot)
@@ -45,14 +51,20 @@ cat(sprintf("The regression model accounted for %.2f%% of the variance in low vi
 
 # 4. Plot the data and line of best fit
 plot <- ggplot(data, aes(x = Normalized_Drawing_Score, y = low_vis_steering_acceleration_10)) +
-  geom_point(color = "blue", size = 2) +   # scatter plot points
+  geom_point(color = "black", size = 2) +   # scatter plot points
   geom_smooth(method = "lm", color = "red", se = TRUE) +  # line of best fit with confidence interval
   labs(
-    title = "Linear Regression: Normalized Drawing Score vs. Low Visibility Lane Deviation",
     x = "Normalized Drawing Score",
-    y = "Low Visibility, Steering Acceleration in Trial 10"
+    y = bquote("Mean Steering Acc. in Low Vis. ( deg / "~s^2~")")
   ) +
-  theme_minimal()
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 20),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15)
+  )
 
 # Show plot
 print(plot)
@@ -73,14 +85,21 @@ cat(sprintf("The regression model accounted for %.2f%% of the variance in low vi
 
 # 4. Plot the data and line of best fit
 plot <- ggplot(data, aes(x = DTW_score, y = low_vis_var_lane_dev_10)) +
-  geom_point(color = "blue", size = 2) +   # scatter plot points
+  geom_point(color = "black", size = 2) +   # scatter plot points
   geom_smooth(method = "lm", color = "red", se = TRUE) +  # line of best fit with confidence interval
   labs(
-    title = "Linear Regression: DTW Score vs. Low Visibility Lane Deviation",
-    x = "DTW Score",
-    y = "Low Visibility, Variability in Lane Deviation in Trial 10"
-  ) +
-  theme_minimal()
+    x = "Mean DTW Score",
+    y = "SD of Lane Dev. in Low Vis. (meters)"
+  )  +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 20),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15)
+  )
+
 
 # Show plot
 print(plot)
@@ -100,14 +119,20 @@ cat(sprintf("The regression model accounted for %.2f%% of the variance in low vi
 
 # 4. Plot the data and line of best fit
 plot <- ggplot(data, aes(x = DTW_score, y = low_vis_steering_acceleration_10)) +
-  geom_point(color = "blue", size = 2) +   # scatter plot points
+  geom_point(color = "black", size = 2) +   # scatter plot points
   geom_smooth(method = "lm", color = "red", se = TRUE) +  # line of best fit with confidence interval
   labs(
-    title = "Linear Regression: DTW Score vs. Low Visibility Lane Deviation",
-    x = "DTW Score",
-    y = "Low Visibility, Steering Acceleration in Trial 10"
+    x = "Mean DTW Score",
+    y = "Mean Steering Acc. in Low Vis. ( deg / "~s^2~")"
   ) +
-  theme_minimal()
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 20),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15)
+  )
 
 # Show plot
 print(plot)
