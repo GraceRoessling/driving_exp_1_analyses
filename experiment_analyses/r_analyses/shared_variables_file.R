@@ -104,6 +104,38 @@ calculate_CI <- function(data, column_name, confidence_level = 0.95) {
   ))
 }
 
+# Function for APA regression reporting + full summary
+apa_regression <- function(data, dv, iv) {
+  # Build formula dynamically
+  formula <- as.formula(paste(dv, "~", iv))
+  
+  # Fit linear model
+  model <- lm(formula, data = data)
+  summary_model <- summary(model)
+  
+  # Print the full regression summary
+  print(summary_model)
+  
+  # Extract values
+  r_squared <- summary_model$r.squared
+  f_stat <- summary_model$fstatistic[1]
+  df1 <- summary_model$fstatistic[2]
+  df2 <- summary_model$fstatistic[3]
+  p_value <- pf(f_stat, df1, df2, lower.tail = FALSE)
+  
+  # Format p-value for APA (three decimals, p < .001 if very small)
+  p_str <- ifelse(p_value < .001, "< .001", sprintf("= %.3f", p_value))
+  
+  # Print APA-style report
+  cat(sprintf(
+    "\nAPA-style report:\nA significant regression %s found (F(%d, %d) = %.2f, p %s). The R² was %.3f, indicating that %s explained approximately %.1f%% of the variance in %s.\n",
+    ifelse(p_value < 0.05, "was", "was not"),
+    df1, df2, f_stat, p_str,
+    r_squared, iv, r_squared * 100, dv
+  ))
+}
+
+
 # Define one dataframe for all files ----------------------------
 subject_id = main_df[["subject_id"]]
 familiarity = main_df[["condition"]]
