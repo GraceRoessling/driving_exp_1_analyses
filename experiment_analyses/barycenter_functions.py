@@ -7,6 +7,25 @@ from scipy.spatial import procrustes
 from scipy.interpolate import interp1d
 import matplotlib.patheffects as pe
 
+def compute_road_edges(center_x, center_y, road_width=10):
+    """
+    Compute left and right road edges given a centerline and road width.
+    """
+    dx = np.gradient(center_x)
+    dy = np.gradient(center_y)
+    tangents = np.vstack([dx, dy]).T
+    norms = np.linalg.norm(tangents, axis=1, keepdims=True)
+
+    # Perpendicular unit normals (rotate tangents 90°)
+    normals = np.hstack([-tangents[:, 1:2], tangents[:, 0:1]]) / norms
+
+    half_width = road_width / 2.0
+    left_x = center_x + normals[:, 0] * half_width
+    left_y = center_y + normals[:, 1] * half_width
+    right_x = center_x - normals[:, 0] * half_width
+    right_y = center_y - normals[:, 1] * half_width
+
+    return left_x, left_y, right_x, right_y
 
 def getCostMatrix(dist_mat):
     """
@@ -195,6 +214,11 @@ def plot_trajectories_for_group_with_dba(condition,group_trajectories,track_piec
     # plt.plot(dba_df['X'], dba_df['Z'], color=dba_color, lw=4, label='Mean Trajectory')
     plt.plot(dba_df['X'], dba_df['Z'], color= dba_color, lw=4,label='Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
 
+    # Compute and plot road edges
+    left_x, left_y, right_x, right_y = compute_road_edges(track_piece_center_x, track_piece_center_y, road_width=10)
+    plt.plot(left_x, left_y, color='black', lw=2, label='Road Edge')
+    plt.plot(right_x, right_y, color='black', lw=2)
+
     # Plotting labels
     plt.title(f'Trajectories on Trial 10 for {track_piece_object.id} for {condition} group')
     plt.xlabel('X Position')
@@ -230,7 +254,12 @@ def plot_comp_of_barycenters(track_piece_object):
     plt.plot(control_dba_df['X'], control_dba_df['Z'], color='royalblue', lw=4,label='Control Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     plt.plot(ss_dba_df['X'], ss_dba_df['Z'], color='green',lw=4,label='Scrambled Segments Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     plt.plot(sl_dba_df['X'], sl_dba_df['Z'], color='red',lw=4,label='Scrambled Landmarks Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    
+
+    # Compute and plot road edges
+    left_x, left_y, right_x, right_y = compute_road_edges(track_piece_center_x, track_piece_center_y, road_width=10)
+    plt.plot(left_x, left_y, color='black', lw=2, label='Road Edge')
+    plt.plot(right_x, right_y, color='black', lw=2)
+
     # Plotting labels
     plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
     plt.xlabel('X Position')
@@ -290,6 +319,11 @@ def plot_comp_of_barycenters_and_trajectories(group_dict, track_piece_object):
     plt.plot(control_dba_df['X'], control_dba_df['Z'], color='royalblue', lw=4,label='Control Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     plt.plot(ss_dba_df['X'], ss_dba_df['Z'], color='green',lw=4,label='Scrambled Segments Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
 
+    # Compute and plot road edges
+    left_x, left_y, right_x, right_y = compute_road_edges(track_piece_center_x, track_piece_center_y, road_width=10)
+    plt.plot(left_x, left_y, color='black', lw=2, label='Road Edge')
+    plt.plot(right_x, right_y, color='black', lw=2)
+
     # Plotting labels
     plt.title(f'Mean Trajectories on Trial 10 for {track_piece_object.id}')
     plt.xlabel('X Position')
@@ -338,6 +372,11 @@ def plot_trajectories_for_all_group(group_dict,track_piece_object):
     plt.title(f'Trajectories on Trial 10 for {track_piece_object.id}')
     plt.xlabel('X Position')
     plt.ylabel('Z Position')
+
+    # Compute and plot road edges
+    left_x, left_y, right_x, right_y = compute_road_edges(track_piece_center_x, track_piece_center_y, road_width=10)
+    plt.plot(left_x, left_y, color='black', lw=2, label='Road Edge')
+    plt.plot(right_x, right_y, color='black', lw=2)
     
     # Other Plotting params
     ax = plt.gca()
