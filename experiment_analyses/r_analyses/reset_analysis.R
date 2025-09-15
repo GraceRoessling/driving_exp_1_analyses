@@ -1,27 +1,23 @@
 library(ggplot2)
 library(tidyverse)
 
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\drawing_scores.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\resets_per_subj.csv"
 data = read.csv(csv_path,stringsAsFactors=TRUE)
 
-# Create a named vector for segment renaming
-segment_labels <- c(
-  "Constant",
-  "Variable"
-)
 
 
 # If needed, ensure 'Condition' is a factor
 data$condition <- as.factor(data$condition)
 
 # Conduct independent t-test
-t_test_result <- t.test(Score ~ condition, data = data, var.equal = TRUE)  # use var.equal=FALSE if variances are unequal
+t_test_result <- t.test(resets ~ condition, data = data, var.equal = TRUE)  # use var.equal=FALSE if variances are unequal
 
 # Print results
 print(t_test_result)
 
+
 # Averaged into three groups
-ggplot(data, aes(x = condition, y = Normalized.Score, fill = condition)) +
+ggplot(data, aes(x = condition, y = resets, fill = condition)) +
   stat_summary(
     fun = mean,
     geom = "bar",
@@ -32,11 +28,13 @@ ggplot(data, aes(x = condition, y = Normalized.Score, fill = condition)) +
     geom = "errorbar",
     width = 0.2
   ) +
-  scale_fill_manual(values = c("constant" = "#0000FF", "variable" = "#FF4040"), labels = c("constant" = "Constant Track", "variable" = "Variable Track")) +
-  scale_x_discrete(labels = segment_labels) +
+  scale_fill_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040"), labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")) +
+  scale_x_discrete(
+    labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
+  ) +
   labs(
-    x = "Configuration Constancy",
-    y = "Mean Accuracy Score"
+    x = "Track Constancy",
+    y = "Mean Number of Resets"
   ) +
   theme(legend.position = "none",
         panel.grid.major.x = element_blank(),
@@ -46,4 +44,3 @@ ggplot(data, aes(x = condition, y = Normalized.Score, fill = condition)) +
         axis.text.x = element_text(size = 20),
         axis.text.y = element_text(size = 30)
   )
-
