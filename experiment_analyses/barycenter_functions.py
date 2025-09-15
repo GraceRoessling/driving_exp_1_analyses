@@ -227,10 +227,10 @@ def plot_trajectories_for_group(condition,group_trajectories,track_piece_object)
     
     # Other Plotting params
     ax = plt.gca()
-    ax.autoscale()
+    ax.set_aspect('equal', 'box')
     plt.grid(True)
     plt.tight_layout()
-    plt.legend(prop={'size': 14})
+    plt.legend(loc=1, prop={'size': 9})
     # plt.show()
     plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{condition}_{track_piece_object.id}_all_trajectories_and_dba_moded.svg")
 
@@ -256,15 +256,15 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.plot(track_piece_center_x, track_piece_center_y, color='black', linestyle='dotted', lw=3, label='Road Center')
 
     # Plot the DBA trajectory
-    # dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
-    # constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
-    # variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    dir_path = "C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/"
+    constant_dba_file_path = dir_path + f"/Constant Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
+    variable_dba_file_path = dir_path + f"/Variable Track_{track_piece_object.id}_DBA_traj_scaled2.csv"
     
-    # constant_dba_df = pd.read_csv(constant_dba_file_path)
-    # variable_dba_df = pd.read_csv(variable_dba_file_path)
+    constant_dba_df = pd.read_csv(constant_dba_file_path)
+    variable_dba_df = pd.read_csv(variable_dba_file_path)
     
-    # plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
-    # plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(variable_dba_df['X'], variable_dba_df['Z'], color='red', lw=4,label='Variable Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
+    plt.plot(constant_dba_df['X'], constant_dba_df['Z'], color='royalblue', lw=4,label='Constant Track Group Mean Trajectory',path_effects=[pe.Stroke(linewidth=7, foreground='black'), pe.Normal()])
     
     # Compute and plot road edges
     left_x, left_y, right_x, right_y = compute_road_edges(track_piece_center_x, track_piece_center_y, road_width=10)
@@ -277,10 +277,12 @@ def plot_comp_of_barycenters_and_trajectories(familiar_group_trajectories, unfam
     plt.ylabel('Z Position')
     
     # Other Plotting params
+
     ax = plt.gca()
-    ax.autoscale()
+    ax.set_aspect('equal', 'box')
     plt.grid(True)
     plt.tight_layout()
-    plt.legend(loc=1,prop={'size': 13})
+    plt.legend(loc=1, prop={'size': 9})
+
     #plt.show()
-    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_traj_only.svg")
+    plt.savefig(f"C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/presentations/r_figures/{track_piece_object.id}_traj_and_barycenter.svg")
