@@ -11,6 +11,7 @@ library(afex)
 library(emmeans)
 library(broom)
 library(afex)
+library(DescTools)
 
 # To compare between both visibility conditions without straight pieces
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_corrected_steering_acc5.csv"
@@ -135,6 +136,44 @@ apa_regression <- function(data, dv, iv) {
   ))
 }
 
+apa_spearman <- function(
+    data,
+    x,
+    y,
+    use = "complete.obs",
+    conf.level = 0.95
+) {
+  
+  x_vals <- data[[x]]
+  y_vals <- data[[y]]
+  
+  res <- cor.test(
+    x_vals,
+    y_vals,
+    method = "spearman",
+    use = use,
+    conf.level = conf.level,
+    exact = FALSE
+  )
+  
+  print(res)
+  
+  rho <- unname(res$estimate)
+  p_value <- res$p.value
+  ci <- res$conf.int
+  n <- sum(complete.cases(x_vals, y_vals))
+  
+  p_str <- ifelse(p_value < .001, "< .001", sprintf("= %.3f", p_value))
+  
+  cat(sprintf(
+    "\nAPA-style report:\nA Spearman rank-order correlation %s found between %s and %s, ρ = %.3f, p %s, 95%% CI [%.3f, %.3f], N = %d.\n",
+    ifelse(p_value < 0.05, "was", "was not"),
+    x, y,
+    rho, p_str,
+    ci[1], ci[2],
+    n
+  ))
+}
 
 # Define one dataframe for all files ----------------------------
 subject_id = main_df[["subject_id"]]
