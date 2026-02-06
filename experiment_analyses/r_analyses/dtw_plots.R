@@ -1,6 +1,7 @@
 library(ggplot2)
 library(tidyverse)
-
+library(emmeans)
+library(dplyr)
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_scores_per_track_segment_recovered.csv"
 data = read.csv(csv_path,stringsAsFactors=TRUE)
 
@@ -101,9 +102,6 @@ dtw.aov <- anova_test(
 
 #post hoc
 
-library(emmeans)
-library(dplyr)
-
 # Get estimated marginal means for Segments
 emm <- emmeans(model, ~ Segments)
 
@@ -149,4 +147,23 @@ sig_comparisons <- summary_comparisons %>%
   select(Segment1, mean1, sd1, Segment2, mean2, sd2, estimate, conf.low, conf.high, p.value)
 
 print(sig_comparisons)
+
+# Linear mixed effects model =======================================
+
+lmm_model <- lmer(Segment.Costs ~ Segments * Condition + (1 | subject_id), data = data)
+summary(lmm_model)
+
+# Post-hoc comparisons for the interaction
+emm_lmm <- emmeans(lmm_model, ~ Segments * Condition)
+
+# Pairwise comparisons with Bonferroni correction
+pairwise_lmm <- pairs(emm_lmm, adjust = "bonferroni")
+summary_lmm_comparisons <- summary(pairwise_lmm, infer = c(TRUE, TRUE))
+
+# Filter for significant comparisons (p < 0.05)
+sig_lmm_comparisons <- summary_lmm_comparisons %>%
+  filter(p.value < 0.05) %>%
+  select(contrast, estimate, conf.low = lower.CL, conf.high = upper.CL, p.value)
+
+print(sig_lmm_comparisons)
 
