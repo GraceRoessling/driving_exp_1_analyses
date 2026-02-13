@@ -2,6 +2,8 @@ library(ggplot2)
 library(tidyverse)
 library(emmeans)
 library(dplyr)
+library(lme4)
+library(gridExtra)
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_scores_per_track_segment_recovered.csv"
 data = read.csv(csv_path,stringsAsFactors=TRUE)
 
@@ -17,6 +19,24 @@ data$Segments <- factor(data$Segments, levels = c(
   "asymmetric_parabolic_1",
   "spiral"
 ))
+
+segment_order <- c(
+  "chicane",
+  "triple_s",
+  "symmetric_parabolic",
+  "traffic_circle",
+  "asymmetric_parabolic_2",
+  "t_turn",
+  "asymmetric_parabolic_1",
+  "spiral"
+)
+
+# Factor (for labeling, optional)
+data$Segments <- factor(data$Segments, levels = segment_order)
+
+# Numeric/ordinal version for modeling
+data$Segments_num <- as.numeric(data$Segments)  # 1 = chicane, 2 = triple_s, ..., 8 = spiral
+
 
 # Create a named vector for segment renaming
 segment_labels <- c(
@@ -166,4 +186,81 @@ sig_lmm_comparisons <- summary_lmm_comparisons %>%
   select(contrast, estimate, conf.low = lower.CL, conf.high = upper.CL, p.value)
 
 print(sig_lmm_comparisons)
+
+# Linear regression models with increasing complexity =======================================
+
+# Model 1a: Simple linear regression (baseline)
+model_1a <- lm(Segment.Costs ~ Segments_num * Condition, data = data)
+cat("\n=== Model 1a: Simple Linear Regression ===\n")
+print(summary(model_1a))
+
+# Model 1b: Linear mixed effects with random intercepts
+model_1b <- lmer(Segment.Costs ~ Segments_num * Condition + (1 | subject_id), data = data)
+cat("\n=== Model 1b: Mixed Effects (Random Intercepts) ===\n")
+print(summary(model_1b))
+
+# Model 1c: Linear mixed effects with random intercepts and random slopes
+model_1c <- lmer(Segment.Costs ~ Segments_num * Condition + (1 + Segments_num || subject_id), data = data)
+cat("\n=== Model 1c: Mixed Effects (Random Intercepts + Random Slopes) ===\n")
+print(summary(model_1c))
+
+# Generate predictions for plotting
+data$pred_1a <- predict(model_1a, newdata = data, re.form = NA)
+data$pred_1b <- predict(model_1b, newdata = data, re.form = NA)
+data$pred_1c <- predict(model_1c, newdata = data, re.form = NA)
+
+# Create figure with three plots
+p1 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_line(aes(y = pred_1a), color = "black", linewidth = 1, alpha = 0.7) +
+  scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
+  labs(
+    title = "Model 1a: Simple Linear Regression",
+    x = "DTW Score",
+    y = "Predicted DTW Score",
+    color = "Condition"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom"
+  )
+
+p2 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_line(aes(y = pred_1b), color = "black", linewidth = 1, alpha = 0.7) +
+  scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
+  labs(
+    title = "Model 1b: Random Intercepts",
+    x = "DTW Score",
+    y = "Predicted DTW Score",
+    color = "Condition"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom"
+  )
+
+p3 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_line(aes(y = pred_1c, group = subject_id), color = "black", linewidth = 1, alpha = 0.3) +
+  scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
+  labs(
+    title = "Model 1c: Random Intercepts + Random Slopes",
+    x = "DTW Score",
+    y = "Predicted DTW Score",
+    color = "Condition"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.position = "bottom"
+  )
+
+# Arrange the three plots
+gridExtra::grid.arrange(p1, p2, p3, ncol = 3)
 

@@ -12,6 +12,7 @@ library(emmeans)
 library(broom)
 library(afex)
 library(DescTools)
+library(gridExtra)
 
 # To compare between both visibility conditions without straight pieces
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_corrected_steering_acc5.csv"
