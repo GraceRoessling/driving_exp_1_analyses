@@ -4,8 +4,9 @@ library(emmeans)
 library(dplyr)
 library(lme4)
 library(gridExtra)
+
 csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_scores_per_track_segment_recovered.csv"
-data = read.csv(csv_path,stringsAsFactors=TRUE)
+data = read.csv(csv_path, stringsAsFactors = TRUE)
 
 colnames(data) <- c("subject_id", "Segments", "Condition", "Segment.Costs")
 
@@ -31,12 +32,10 @@ segment_order <- c(
   "spiral"
 )
 
-# Factor (for labeling, optional)
 data$Segments <- factor(data$Segments, levels = segment_order)
 
 # Numeric/ordinal version for modeling
-data$Segments_num <- as.numeric(data$Segments)  # 1 = chicane, 2 = triple_s, ..., 8 = spiral
-
+data$Segments_num <- as.numeric(data$Segments)
 
 # Create a named vector for segment renaming
 segment_labels <- c(
@@ -52,14 +51,12 @@ segment_labels <- c(
 
 # Each segment, each group plotted (2x8 BARS)
 ggplot(data, aes(x = Segments, y = Segment.Costs, fill = Condition)) +
-  # Bars showing the mean
   stat_summary(
     fun = mean,
     geom = "bar",
     position = position_dodge(width = 0.9),
     width = 0.8
   ) +
-  # Error bars showing 95% CI
   stat_summary(
     fun.data = mean_cl_normal,
     geom = "errorbar",
@@ -111,38 +108,26 @@ ggplot(data, aes(x = Condition, y = Segment.Costs, fill = Condition)) +
         axis.text.y = element_text(size = 20)
   )
 
+# ANOVA =====================================================================
 model <- aov(Segment.Costs ~ Condition * Segments + Error(subject_id/(Condition * Segments)), data = data)
 summary(model)
 
 dtw.aov <- anova_test(
   data = data, dv = Segment.Costs, wid = subject_id,
-  between = Condition, within = Segments,effect.size = "pes"
+  between = Condition, within = Segments, effect.size = "pes"
 )
 
-
-#post hoc
-
-# Get estimated marginal means for Segments
+# Post hoc comparisons for segments
 emm <- emmeans(model, ~ Segments)
-
-# Pairwise comparisons with Bonferroni correction, requesting confidence intervals
 pairwise_comparisons <- pairs(emm, adjust = "bonferroni")
-
-# Convert to data frame and include confidence intervals and p-values
 summary_comparisons <- summary(pairwise_comparisons, infer = c(TRUE, TRUE))
 
-# Check the names of the columns to know what is available
-print(names(summary_comparisons))
-
-# Usually the columns for confidence intervals are called "lower.CL" and "upper.CL"
-# Let's rename for easier use:
 summary_comparisons <- summary_comparisons %>%
   rename(
     conf.low = lower.CL,
     conf.high = upper.CL
   )
 
-# Now get means and SDs by segment
 segment_stats <- data %>%
   group_by(Segments) %>%
   summarise(
@@ -150,14 +135,12 @@ segment_stats <- data %>%
     sd_cost = sd(Segment.Costs, na.rm = TRUE)
   )
 
-# Extract segment names from contrast
 summary_comparisons <- summary_comparisons %>%
   mutate(
     Segment1 = sub(" -.*", "", contrast),
     Segment2 = sub(".*- ", "", contrast)
   )
 
-# Join means and SDs for each segment in the comparison
 sig_comparisons <- summary_comparisons %>%
   filter(p.value < 0.05) %>%
   left_join(segment_stats, by = c("Segment1" = "Segments")) %>%
@@ -167,25 +150,6 @@ sig_comparisons <- summary_comparisons %>%
   select(Segment1, mean1, sd1, Segment2, mean2, sd2, estimate, conf.low, conf.high, p.value)
 
 print(sig_comparisons)
-
-# Linear mixed effects model =======================================
-
-lmm_model <- lmer(Segment.Costs ~ Segments * Condition + (1 | subject_id), data = data)
-summary(lmm_model)
-
-# Post-hoc comparisons for the interaction
-emm_lmm <- emmeans(lmm_model, ~ Segments * Condition)
-
-# Pairwise comparisons with Bonferroni correction
-pairwise_lmm <- pairs(emm_lmm, adjust = "bonferroni")
-summary_lmm_comparisons <- summary(pairwise_lmm, infer = c(TRUE, TRUE))
-
-# Filter for significant comparisons (p < 0.05)
-sig_lmm_comparisons <- summary_lmm_comparisons %>%
-  filter(p.value < 0.05) %>%
-  select(contrast, estimate, conf.low = lower.CL, conf.high = upper.CL, p.value)
-
-print(sig_lmm_comparisons)
 
 # Linear regression models with increasing complexity =======================================
 
@@ -204,60 +168,87 @@ model_1c <- lmer(Segment.Costs ~ Segments_num * Condition + (1 + Segments_num ||
 cat("\n=== Model 1c: Mixed Effects (Random Intercepts + Random Slopes) ===\n")
 print(summary(model_1c))
 
-# Generate predictions for plotting
-data$pred_1a <- predict(model_1a, newdata = data, re.form = NA)
-data$pred_1b <- predict(model_1b, newdata = data, re.form = NA)
-data$pred_1c <- predict(model_1c, newdata = data, re.form = NA)
+# Compute mean + SE per segment & condition for plotting
+plot_data <- data %>%
+  group_by(Segments, Condition) %>%
+  summarise(
+    mean_cost = mean(Segment.Costs),
+    se = sd(Segment.Costs) / sqrt(n()),
+    .groups = "drop"
+  )
+
+# Generate subject-level predictions for models 1b and 1c
+data_1b <- data %>%
+  mutate(pred = predict(model_1b))
+
+data_1c <- data %>%
+  mutate(pred = predict(model_1c))
 
 # Create figure with three plots
-p1 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
-  geom_point(alpha = 0.5, size = 2) +
-  geom_line(aes(y = pred_1a), color = "black", linewidth = 1, alpha = 0.7) +
+p1 <- ggplot() +
+  geom_line(data = data, aes(x = Segments, y = Segment.Costs, group = subject_id), 
+            color = "black", alpha = 0.3, linewidth = 0.5, linetype = "dashed") +
+  geom_line(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition, group = Condition), linewidth = 1) +
+  geom_point(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition), size = 2) +
+  geom_errorbar(data = plot_data, aes(x = Segments, ymin = mean_cost - se, ymax = mean_cost + se, color = Condition), width = 0.2, alpha = 0.8) +
   scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
   labs(
     title = "Model 1a: Simple Linear Regression",
-    x = "DTW Score",
-    y = "Predicted DTW Score",
+    x = "Segment",
+    y = "DTW Score",
     color = "Condition"
   ) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 14, face = "bold"),
     axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
 
-p2 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
-  geom_point(alpha = 0.5, size = 2) +
-  geom_line(aes(y = pred_1b), color = "black", linewidth = 1, alpha = 0.7) +
+p2 <- ggplot() +
+  geom_line(data = data_1b, aes(x = Segments, y = pred, group = subject_id, color = Condition), 
+            alpha = 0.4, linewidth = 0.6) +
+  geom_line(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition, group = Condition), 
+            linewidth = 1.5, linetype = "solid") +
+  geom_point(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition), size = 2) +
+  geom_errorbar(data = plot_data, aes(x = Segments, ymin = mean_cost - se, ymax = mean_cost + se, color = Condition), 
+                width = 0.2, alpha = 0.8) +
   scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
   labs(
     title = "Model 1b: Random Intercepts",
-    x = "DTW Score",
-    y = "Predicted DTW Score",
+    x = "Segment",
+    y = "DTW Score",
     color = "Condition"
   ) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 14, face = "bold"),
     axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
 
-p3 <- ggplot(data, aes(x = Segment.Costs, y = Segment.Costs, color = Condition)) +
-  geom_point(alpha = 0.5, size = 2) +
-  geom_line(aes(y = pred_1c, group = subject_id), color = "black", linewidth = 1, alpha = 0.3) +
+p3 <- ggplot() +
+  geom_line(data = data_1c, aes(x = Segments, y = pred, group = subject_id, color = Condition), 
+            alpha = 0.4, linewidth = 0.6) +
+  geom_line(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition, group = Condition), 
+            linewidth = 1.5, linetype = "solid") +
+  geom_point(data = plot_data, aes(x = Segments, y = mean_cost, color = Condition), size = 2) +
+  geom_errorbar(data = plot_data, aes(x = Segments, ymin = mean_cost - se, ymax = mean_cost + se, color = Condition), 
+                width = 0.2, alpha = 0.8) +
   scale_color_manual(values = c("familiar" = "#0000FF", "unfamiliar" = "#FF4040")) +
   labs(
     title = "Model 1c: Random Intercepts + Random Slopes",
-    x = "DTW Score",
-    y = "Predicted DTW Score",
+    x = "Segment",
+    y = "DTW Score",
     color = "Condition"
   ) +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 14, face = "bold"),
     axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
 
