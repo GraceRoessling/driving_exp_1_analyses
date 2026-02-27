@@ -5,7 +5,7 @@ library(dplyr)
 library(lme4)
 library(gridExtra)
 
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_scores_per_track_segment_recovered.csv"
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\dtw_scores_per_track_segment_recovered_redone.csv"
 data = read.csv(csv_path, stringsAsFactors = TRUE)
 
 colnames(data) <- c("subject_id", "Segments", "Condition", "Segment.Costs")
