@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 from scipy.stats import ttest_ind
 
-dtw_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/dtw_data_recovered.csv")
+dtw_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/dtw_scores_per_track_segment_recovered_redone.csv")
 drawing_scores_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/drawing_scores.csv")
 perf_score_df = pd.read_csv("C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/data/main_analysis_30_total_subjects_corrected_steering_acc6.csv")
 
