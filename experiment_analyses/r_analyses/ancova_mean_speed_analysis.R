@@ -95,9 +95,9 @@ mean_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = mean_spee
     legend.text.align = 0,   # Left-align item labels
     legend.direction = "vertical",  # Stack vertically
     legend.box.just = "left",  # Align legend box left
-    plot.title = element_text(size = 40),
-    axis.title.x = element_text(size = 40),
-    axis.title.y = element_text(size = 40),
+    plot.title = element_text(size = 30),
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
     axis.text.x = element_text(size = 30),
     axis.text.y = element_text(size = 30)
   )

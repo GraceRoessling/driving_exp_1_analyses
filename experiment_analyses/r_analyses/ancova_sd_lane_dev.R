@@ -26,8 +26,11 @@ pwc <- sd_lane_dev_df_2 %>%
     sd_lane_dev ~ condition, covariate = total_steering_acceleration_1, p.adjust.method = "bonferroni"
   )
 
-pwc %>%
-  select(visibility, group1, group2, conf.low, conf.high, p.adj)
+# Get emmeans with confidence intervals
+pwc_emmeans <- get_emmeans(pwc)
+
+pwc_emmeans %>%
+  select(visibility, condition, emmean, conf.low, conf.high)
 
 lp <- ggline(
   get_emmeans(pwc), x = "visibility", y = "emmean", 
@@ -85,8 +88,8 @@ sd_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_lane_
   theme(
     legend.position = "none",
     plot.title = element_text(size = 30),
-    axis.title.x = element_text(size = 40),
-    axis.title.y = element_text(size = 40),
+    axis.title.x = element_text(size = 30),
+    axis.title.y = element_text(size = 30),
     axis.text.x = element_text(size = 30),
     axis.text.y = element_text(size = 30)
   )

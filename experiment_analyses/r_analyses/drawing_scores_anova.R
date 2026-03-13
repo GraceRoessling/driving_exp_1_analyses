@@ -11,17 +11,33 @@ segment_labels <- c(
   "Scrambled Segments"
 )
 
+# Calculate means and 95% CIs for each condition
+summary_stats <- data %>%
+  group_by(Condition) %>%
+  summarise(
+    Mean = mean(Score, na.rm = TRUE),
+    SD = sd(Score, na.rm = TRUE),
+    N = n(),
+    SE = SD / sqrt(N),
+    CI_Lower = Mean - (1.96 * SE),
+    CI_Upper = Mean + (1.96 * SE),
+    .groups = 'drop'
+  ) %>%
+  select(Condition, Mean, CI_Lower, CI_Upper)
 
-model <- aov(Normalized.Score ~ Condition + Error(Drawing.ID/(Condition)), data = data)
+print("Summary Statistics: Mean Scores with 95% Confidence Intervals")
+print(summary_stats)
+
+model <- aov(Score ~ Condition + Error(Drawing.ID/(Condition)), data = data)
 summary(model)
 
 dtw.aov <- anova_test(
-  data = data, dv = Normalized.Score, wid = Drawing.ID,
+  data = data, dv = Score, wid = Drawing.ID,
   between = Condition,effect.size = "pes"
 )
 
 # Averaged into three groups
-ggplot(data, aes(x = Condition, y = Normalized.Score, fill = Condition)) +
+ggplot(data, aes(x = Condition, y = Score, fill = Condition)) +
   stat_summary(
     fun = mean,
     geom = "bar",
@@ -57,13 +73,13 @@ library(dplyr)
 # Perform pairwise t-tests with Bonferroni adjustment (for p-values)
 posthoc <- data %>%
   pairwise_t_test(
-    Normalized.Score ~ Condition,
+    Score ~ Condition,
     p.adjust.method = "bonferroni"
   )
 print(posthoc)
 
 # Now compute emmeans and pairwise comparisons with confidence intervals
-fit <- lm(Normalized.Score ~ Condition, data = data)
+fit <- lm(Score ~ Condition, data = data)
 
 emm <- emmeans(fit, specs = "Condition")
 
