@@ -121,3 +121,37 @@ summary_df <- summary(emm_results, infer = c(TRUE, TRUE)) %>%
 
 # Print APA-style table
 print(summary_df)
+
+# Display the plot
+mean_steering_acc_plot_ancova
+
+# Print unadjusted means by condition for comparison
+cat("\n=== UNADJUSTED MEANS BY CONDITION (Pre-Covariate Adjustment) ===\n")
+unadjusted_means <- mean_steering_dev_df_2 %>%
+  group_by(condition, visibility) %>%
+  summarise(
+    mean = mean(mean_steering_acceleration, na.rm = TRUE),
+    sd = sd(mean_steering_acceleration, na.rm = TRUE),
+    n = n(),
+    .groups = 'drop'
+  )
+print(unadjusted_means)
+
+cat("\n=== ADJUSTED MEANS BY CONDITION (Post-Covariate Adjustment) ===\n")
+print(summary_df)
+
+# Create comparison table
+cat("\n=== COMPARISON: UNADJUSTED vs ADJUSTED MEANS ===\n")
+comparison_table <- unadjusted_means %>%
+  rename(unadjusted_mean = mean, unadjusted_sd = sd) %>%
+  left_join(
+    summary_df %>%
+      select(condition, visibility, mean, SE) %>%
+      rename(adjusted_mean = mean, adjusted_se = SE),
+    by = c("condition", "visibility")
+  ) %>%
+  mutate(
+    difference = round(adjusted_mean - unadjusted_mean, 2)
+  )
+
+print(comparison_table)
