@@ -49,11 +49,16 @@ plot <- ggplot(data, aes(x = Normalized_Drawing_Score, y = low_vis_var_lane_dev_
     y = "SD of Lane Dev. in Low Vis. (meters)"
   ) +
   scale_color_manual(
+    name = "Condition",
     values = c(
       "familiar"   = "blue",
       "unfamiliar" = "red"
-       )
-    ) +
+    ),
+    labels = c(
+      "familiar"   = "Constant Track",
+      "unfamiliar" = "Variable Track"
+    )
+  ) +
   theme(
     plot.title = element_text(size = 20),
     axis.title.x = element_text(size = 20),
