@@ -60,6 +60,7 @@ plot <- ggplot(data, aes(x = Normalized_Drawing_Score, y = low_vis_var_lane_dev_
     )
   ) +
   theme(
+    legend.position = "none",
     plot.title = element_text(size = 20),
     axis.title.x = element_text(size = 20),
     axis.title.y = element_text(size = 20),
