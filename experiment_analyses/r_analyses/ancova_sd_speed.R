@@ -82,7 +82,6 @@ sd_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_speed_de
     labels = c("control" = "Control Group", "scrambled_landmarks" = "Scrambled Landmarks", "scrambled_segments"="Scrambled Segments")
   ) +
   theme(
-    legend.position = "none",
     plot.title = element_text(size = 30),
     axis.title.x = element_text(size = 30),
     axis.title.y = element_text(size = 30),
