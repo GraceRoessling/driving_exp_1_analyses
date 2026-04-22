@@ -14,6 +14,10 @@ mean_lane_dev_cov.aov <- anova_test(
 
 mean_lane_cov_table <- get_anova_table(mean_lane_dev_cov.aov)
 
+
+
+
+
 # Simple main effect analysis
 
 mean_lane_dev_df_2 %>%
