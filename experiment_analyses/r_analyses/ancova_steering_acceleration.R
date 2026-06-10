@@ -84,7 +84,7 @@ mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = me
     labels = c("familiar" = "Constant Track", "unfamiliar" = "Variable Track")
   )+
   theme(
-    legend.position = "none",
+    legend.position = "bottom",
     plot.title = element_text(size = 30),
     axis.title.x = element_text(size = 30),
     axis.title.y = element_text(size = 30),
