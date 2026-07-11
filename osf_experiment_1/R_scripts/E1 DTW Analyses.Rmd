@@ -49,8 +49,9 @@ library(emmeans)    # for estimated means
 # Step 2: Import the data
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 
-# e2.dtw.data <- read.csv("dtw_data_exp1.csv", header = TRUE)
-e2.dtw.data <- read.csv("C://Users//graci//OneDrive//Documents//GitHub//driving_exp_1_analyses//osf_experiment_1//data//dtw_data_exp1.csv", header = TRUE)
+# Set working directory to osf_experiment_1 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
+e2.dtw.data <- read.csv("./data/dtw_data_exp1.csv", header = TRUE)
 
 # convert to factor
 e2.dtw.data$subject_id <- as.factor(e2.dtw.data$subject_id)

@@ -14,9 +14,12 @@ library(afex)
 library(DescTools)
 library(gridExtra)
 
+
+# Set working directory to osf_experiment_1 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
+
 # To compare between both visibility conditions without straight pieces
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_corrected_steering_acc5.csv"
-main_df = read.csv(csv_path,stringsAsFactors=TRUE)
+main_df = read.csv("./data/main_steering_analysis_data.csv",stringsAsFactors=TRUE)
 
 # Hepler functions --------------------------------------------
 convert_var_to_sd <- function(df) {
