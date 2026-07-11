@@ -1,0 +1,218 @@
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(gridExtra)
+library(patchwork)
+library(effectsize)
+library(afex)      
+library(emmeans)
+library(broom)
+library(afex)
+library(DescTools)
+library(gridExtra)
+
+# To compare between both visibility conditions without straight pieces
+csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\main_analysis_30_total_subjects_corrected_steering_acc5.csv"
+main_df = read.csv(csv_path,stringsAsFactors=TRUE)
+
+# Hepler functions --------------------------------------------
+convert_var_to_sd <- function(df) {
+  df %>%
+    mutate(across(contains("var"), 
+                  ~ sqrt(.),
+                  .names = "{str_replace(.col, 'var', 'sd')}"))
+}
+
+# Function to create a larger text theme
+larger_text_theme <- function(base_size = 14) {
+  theme(base_size = base_size) +
+    theme(
+      axis.title = element_text(size = rel(2)),
+      axis.text = element_text(size = rel(2)),
+      plot.title = element_text(size = rel(2.5), face = "bold"),
+      legend.title = element_text(size = rel(2.1)),
+      legend.text = element_text(size = rel(2))
+    )
+}
+
+
+process_performance_metrics <- function(main_df, performance_metric) {
+  # Step 1: Filter main_df for columns containing performance_metric
+  performance_cols <- grep(performance_metric, names(main_df), value = TRUE)
+  filtered_main_df <- main_df[, performance_cols]
+  
+  # Loop through trials 1 to 10
+  for (i in 1:10) {
+    # Convert iteration to string
+    trial_number <- as.character(i)
+    
+    # Filter for columns containing trial_number
+    trial_cols <- grep(trial_number, names(filtered_main_df), value = TRUE)
+    temp_df <- filtered_main_df[, trial_cols]
+    
+    # Calculate row-wise average
+    avg_values <- rowMeans(temp_df, na.rm = TRUE)
+    
+    # Add new column to main_df
+    main_df[[paste0("avg_", performance_metric, "_", trial_number)]] <- avg_values
+  }
+  return(main_df)
+}
+
+number_ticks <- function(n) {function(limits) pretty(limits, n)}
+
+
+reorder_mean_values <- function(mean_values) {
+  library(dplyr)
+  
+  mean_values_ordered <- mean_values %>%
+    # Convert column_name to numeric
+    mutate(column_name_num = as.numeric(column_name)) %>%
+    # Arrange first by condition, then by the numeric column_name
+    arrange(condition, column_name_num) %>%
+    # Remove the temporary numeric column
+    select(-column_name_num)
+  
+  return(mean_values_ordered)
+}
+
+calculate_CI <- function(data, column_name, confidence_level = 0.95) {
+  # Extract the column data
+  column_data <- data[[column_name]]
+  
+  # Calculate the mean
+  mean_value <- mean(column_data, na.rm = TRUE)
+  
+  # Calculate the standard error
+  se <- sd(column_data, na.rm = TRUE) / sqrt(length(column_data))
+  
+  # Calculate the margin of error
+  degrees_of_freedom <- length(column_data) - 1
+  t_score <- qt((1 + confidence_level) / 2, df = degrees_of_freedom)
+  margin_of_error <- t_score * se
+  
+  # Calculate the confidence interval
+  ci_lower <- mean_value - margin_of_error
+  ci_upper <- mean_value + margin_of_error
+  
+  # Return the results as a list
+  return(list(
+    mean = mean_value,
+    ci_lower = ci_lower,
+    ci_upper = ci_upper
+  ))
+}
+
+# Function for APA regression reporting + full summary
+apa_regression <- function(data, dv, iv) {
+  # Build formula dynamically
+  formula <- as.formula(paste(dv, "~", iv))
+  
+  # Fit linear model
+  model <- lm(formula, data = data)
+  summary_model <- summary(model)
+  
+  # Print the full regression summary
+  print(summary_model)
+  
+  # Extract values
+  r_squared <- summary_model$r.squared
+  f_stat <- summary_model$fstatistic[1]
+  df1 <- summary_model$fstatistic[2]
+  df2 <- summary_model$fstatistic[3]
+  p_value <- pf(f_stat, df1, df2, lower.tail = FALSE)
+  
+  # Format p-value for APA (three decimals, p < .001 if very small)
+  p_str <- ifelse(p_value < .001, "< .001", sprintf("= %.3f", p_value))
+  
+  # Print APA-style report
+  cat(sprintf(
+    "\nAPA-style report:\nA significant regression %s found (F(%d, %d) = %.2f, p %s). The R² was %.3f, indicating that %s explained approximately %.1f%% of the variance in %s.\n",
+    ifelse(p_value < 0.05, "was", "was not"),
+    df1, df2, f_stat, p_str,
+    r_squared, iv, r_squared * 100, dv
+  ))
+}
+
+apa_spearman <- function(
+    data,
+    x,
+    y,
+    use = "complete.obs",
+    conf.level = 0.95
+) {
+  
+  x_vals <- data[[x]]
+  y_vals <- data[[y]]
+  
+  res <- cor.test(
+    x_vals,
+    y_vals,
+    method = "spearman",
+    use = use,
+    conf.level = conf.level,
+    exact = FALSE
+  )
+  
+  print(res)
+  
+  rho <- unname(res$estimate)
+  p_value <- res$p.value
+  ci <- res$conf.int
+  n <- sum(complete.cases(x_vals, y_vals))
+  
+  p_str <- ifelse(p_value < .001, "< .001", sprintf("= %.3f", p_value))
+  
+  cat(sprintf(
+    "\nAPA-style report:\nA Spearman rank-order correlation %s found between %s and %s, ρ = %.3f, p %s, 95%% CI [%.3f, %.3f], N = %d.\n",
+    ifelse(p_value < 0.05, "was", "was not"),
+    x, y,
+    rho, p_str,
+    ci[1], ci[2],
+    n
+  ))
+}
+
+# Define one dataframe for all files ----------------------------
+subject_id = main_df[["subject_id"]]
+familiarity = main_df[["condition"]]
+main_df <- convert_var_to_sd(main_df)
+#main_df <- main_df %>% select(-contains('total')) # if "total" is in the row, take it out
+
+
+# Main analysis : Separate into familiar and unfamiliar groups -----------------
+familiar_df <- main_df %>% filter(!grepl('unfamiliar', condition)) # if "unfamiliar" is in the row, take it out
+unfamiliar_df <- main_df %>% filter(grepl('unfamiliar', condition)) # if "unfamiliar" is in the row, put it in
+sd_df <- main_df[ , grepl( "sd" , names( main_df ) ) ]
+mean_df <- main_df[ , grepl( "mean" , names( main_df ) ) ]
+
+
+# Within analysis : Dataframes for each analysis  -----------------
+# average across low and high visibility  conditions for each metric
+
+# speed analysis -----------------------------------------------
+main_df = process_performance_metrics(main_df,"mean_speed")# Mean speed
+main_df = process_performance_metrics(main_df,"sd_speed")# SD of Speed
+
+# steering analysis --------------------------------------------
+main_df = process_performance_metrics(main_df,"sd_steering")# SD of Steering Angle
+
+# lane deviation analysis --------------------------------------
+main_df = process_performance_metrics(main_df,"mean_lane_dev") # Mean lane deviation
+main_df = process_performance_metrics(main_df,"sd_lane_dev") # SD of lane deviation
+
+# steering acceleration analysis --------------------------------------
+main_df = process_performance_metrics(main_df,"steering_acceleration") # steering acceleration
+
+# -----------------------------------------------------------------------------------------------------------------
+# Shared plotting vars
+pd_for_main <- position_dodge(width = 0.1)
+pd_for_within <- position_dodge(width = 0.3)
+geom_point_size = 3
+line_size = 1
+
+
+print(colnames(main_df))

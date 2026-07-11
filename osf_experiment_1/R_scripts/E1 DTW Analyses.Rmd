@@ -1,0 +1,423 @@
+---
+title: "Exp 1 Analysis of DTW"
+author:
+  - Your name here
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: no
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+
+# Step 1: Preliminaries
+```{r results="hide", message=FALSE}
+
+# clear the workspace
+rm(list = ls())
+
+# load the following packages:
+library(tidyverse)
+library(psych)
+library(qqplotr)
+library(pastecs)
+library(scales)
+library(ez)
+library(effectsize)
+library(Hmisc)
+library(rstatix)
+
+library(lme4)
+library(lmerTest)   # adds p-values
+library(emmeans)    # for estimated means
+
+
+```
+
+# Step 2: Import the data
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+# e2.dtw.data <- read.csv("dtw_data_exp1.csv", header = TRUE)
+e2.dtw.data <- read.csv("C://Users//graci//OneDrive//Documents//GitHub//driving_exp_1_analyses//osf_experiment_1//data//dtw_data_exp1.csv", header = TRUE)
+
+# convert to factor
+e2.dtw.data$subject_id <- as.factor(e2.dtw.data$subject_id)
+e2.dtw.data$track_segment <- as.factor(e2.dtw.data$track_segment)
+e2.dtw.data$condition <- as.factor(e2.dtw.data$condition)
+
+# cap_value <- 0.5
+# e2.dtw.data$DTW_score <- pmin(e2.dtw.data$DTW_score, cap_value)
+
+e2.dtw.data$track_segment <- factor(
+  e2.dtw.data$track_segment,
+  levels = c(
+    "chicane",
+    "triple_s",
+    "symmetric_parabolic",
+    "traffic_circle",
+    "asymmetric_parabolic_1",
+    "t_turn",
+    "asymmetric_parabolic_2",
+    "spiral"
+  ),
+  labels = c(
+    "Chicane",
+    "Triple-S",
+    "Symm. Parab.",
+    "Traffic Circle",
+    "Asym. Parab. 1",
+    "T-turn",
+    "Asym. Parab. 2",
+    "Spiral"
+  )
+)
+
+# add a column with the log DTW score
+e2.dtw.data <- e2.dtw.data %>%
+  mutate(log_DTW_score = log(DTW_score))
+
+
+```
+
+# Histograms showing distribution of raw scores and log-transformed scores
+```{r}
+
+
+ggplot(e2.dtw.data, aes(x = DTW_score)) +
+  geom_histogram(color = "black", fill = "gray80") +
+  facet_grid(track_segment ~ condition) +
+  labs(
+    x = "DTW Cost",
+    y = "Count",
+    title = "Histograms of DTW Cost by Track Segment and Condition"
+  ) +
+  theme_minimal()
+
+ggplot(e2.dtw.data, aes(x = log_DTW_score)) +
+  geom_histogram(color = "black", fill = "gray80") +
+  facet_grid(track_segment ~ condition) +
+  labs(
+    x = "log DTW Cost",
+    y = "Count",
+    title = "Histograms of DTW Cost by Track Segment and Condition"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+# Draw some plots
+```{r}
+
+dtw_plot <- ggplot(data = e2.dtw.data, aes(x = condition, y = DTW_score, fill = condition)) + 
+  stat_summary(fun = mean, geom = "point") +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.1) +
+  scale_fill_manual(values = c("blue", "red")) +
+  # theme_minimal() +
+  labs(x = "Track constancy", y = "Mean DTW cost") + 
+  scale_x_discrete(
+    labels = c("familiar" = "Constant", "unfamiliar" = "Variable")
+  ) +
+  theme(legend.position = "none",
+    axis.title.x = element_text(size = 14),  # X-axis label font size
+    axis.title.y = element_text(size = 14),   # Y-axis label font size
+    axis.text.x = element_text(size = 10),   # tick labels on x-axis
+    axis.text.y = element_text(size = 10)    # tick labels on y-axis
+  )
+
+dtw_plot
+
+ggsave("dtw_plot.png", plot = dtw_plot, width = 4.83, height = 2.53, dpi = 300)
+ggsave("dtw_plot.svg", plot = dtw_plot, width = 4.83, height = 2.53)
+
+
+log_dtw_plot <- ggplot(
+  data = e2.dtw.data,
+  aes(
+    x = condition,
+    y = log_DTW_score,
+    fill = condition,
+    color = condition
+  )
+) + 
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 21,
+    size = 4
+  ) +
+  stat_summary(
+    fun.data = mean_cl_boot,
+    geom = "errorbar",
+    width = 0.1
+  ) +
+  scale_fill_manual(values = c(
+    "familiar" = "blue",      # Constant
+    "unfamiliar" = "red"      # Variable
+  )) +
+  scale_color_manual(values = c(
+    "familiar" = "blue",
+    "unfamiliar" = "red"
+  )) +
+  labs(x = "Track constancy", y = "Mean Log DTW cost") + 
+  scale_x_discrete(
+    labels = c(
+      "familiar" = "Constant",
+      "unfamiliar" = "Variable"
+    )
+  ) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  )
+
+log_dtw_plot
+
+ggsave("log_dtw_plot.png", plot = log_dtw_plot, width = 4.83, height = 2.53, dpi = 300)
+ggsave("log_dtw_plot.svg", plot = log_dtw_plot, width = 4.83, height = 2.53)
+
+# pd <- position_dodge(width = 0.4)
+# 
+# ggplot(data = e2.dtw.data, aes(x = track_segment, y = DTW_score, group = condition, color = condition)) + 
+#   stat_summary(fun = mean, geom = "point", fill = "White", color = "Black", position = pd) +
+#   stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, position = pd)
+
+log_dtw_by_segment_plot <- ggplot(data = e2.dtw.data, aes(x = track_segment, y = log_DTW_score, color = condition, group = condition)) + 
+  stat_summary(fun = mean, geom = "point", position = position_dodge(width = 0.3)) +
+  stat_summary(fun = mean, geom = "line", position = position_dodge(width = 0.3)) +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, position = position_dodge(width = 0.3)) +
+  # theme_minimal() +
+  labs(x = "Track segment", y = "Mean log DTW cost") + 
+  scale_x_discrete(
+    labels = c("familiar" = "Constant", "unfamiliar" = "Variable")
+  ) +
+  scale_color_manual(values = c(
+    "familiar"   = "blue",
+    "unfamiliar" = "red"
+  ),
+  labels = c(
+    "familiar"   = "Constant",
+    "unfamiliar" = "Variable"
+  )) +
+  theme(legend.position = c(0.025, 0.95),
+        legend.justification = c("left", "top"),
+        legend.title = element_blank(),
+        legend.background = element_rect(fill = "transparent", color = NA),
+        legend.box.background = element_rect(fill = "transparent", color = NA),
+        legend.text = element_text(size = 12),
+        axis.title.x = element_text(size = 14),  # X-axis label font size
+        axis.title.y = element_text(size = 14),   # Y-axis label font size
+        axis.text.x  = element_text(size = 10, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 10)    # tick labels on y-axis
+  )
+
+log_dtw_by_segment_plot
+
+ggsave("log_dtw_by_segment_plot.png", plot = log_dtw_by_segment_plot, width = 6, height = 4, dpi = 300)
+ggsave("log_dtw_by_segment_plot.svg", plot = log_dtw_by_segment_plot, width = 6, height = 4)
+
+
+```
+
+
+# Run a two-way anova
+```{r}
+
+# anova_results <- ezANOVA(data = e2.dtw.data,
+#                      dv = DTW_score,
+#                      wid = subject_id,
+#                      within = .(track_segment),
+#                      between = .(condition),
+#                      type = 3,
+#                      detailed = TRUE)
+
+anova_results <- ezANOVA(data = e2.dtw.data,
+                     dv = log_DTW_score,
+                     wid = subject_id,
+                     within = .(track_segment),
+                     between = .(condition),
+                     type = 3,
+                     detailed = TRUE)
+
+anova_results
+
+anova_table <- anova_results$ANOVA
+
+# partial eta squared
+anova_table$pes <- with(anova_table, SSn / (SSn + SSd))
+
+anova_table[, c("Effect", "DFn", "DFd", "F", "p", "ges", "pes")]
+
+```
+
+# Average data (raw DTW scores) across track segment and run a t-test
+```{r}
+
+e2.dtw.data2 <- e2.dtw.data %>%
+  group_by(subject_id, condition) %>%
+  summarise(mean_DTW_score = mean(DTW_score, na.rm = TRUE),
+            .groups = "drop")
+
+t.test(mean_DTW_score ~ condition, data = e2.dtw.data2)
+
+dtw_plot2 <- ggplot(data = e2.dtw.data2, aes(x = condition, y = mean_DTW_score, fill = condition)) + 
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.1) +
+  scale_fill_manual(values = c("blue", "red")) +
+  # theme_minimal() +
+  labs(x = "Track constancy", y = "Mean DTW cost") + 
+  scale_x_discrete(
+    labels = c("familiar" = "Constant", "unfamiliar" = "Variable")
+  ) +
+  theme(legend.position = "none",
+    axis.title.x = element_text(size = 14),  # X-axis label font size
+    axis.title.y = element_text(size = 14),   # Y-axis label font size
+    axis.text.x = element_text(size = 10),   # tick labels on x-axis
+    axis.text.y = element_text(size = 10)    # tick labels on y-axis
+  )
+
+dtw_plot2
+
+ggsave("dtw_by_cond_barplot.png", plot = dtw_plot2, width = 6, height = 3, dpi = 300)
+ggsave("dtw_by_cond_barplot.svg", plot = dtw_plot2, width = 6, height = 3)
+
+
+```
+
+# Average data (log-transformed DTW scores) across track segment and run a t-test
+```{r}
+
+e2.dtw.data_log <- e2.dtw.data %>%
+  mutate(log_DTW = log(DTW_score)) %>%   # natural log
+  group_by(subject_id, condition) %>%
+  summarise(mean_log_DTW = mean(log_DTW, na.rm = TRUE),
+            .groups = "drop")
+
+t.test(mean_log_DTW ~ condition, data = e2.dtw.data_log)
+
+effectsize::cohens_d(mean_log_DTW ~ condition,
+                   data = e2.dtw.data_log,
+                   pooled_sd = FALSE,
+                   adjust = TRUE)
+
+# Calculate means and 95% CIs
+e2.dtw.data_log %>%
+  group_by(condition) %>%
+  get_summary_stats(mean_log_DTW, type = "mean_ci") %>%
+  mutate(
+    ci_lower = mean - ci,
+    ci_upper = mean + ci
+  )
+
+dtw_plot2_log <- ggplot(data = e2.dtw.data_log, aes(x = condition, y = mean_log_DTW, fill = condition)) + 
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1) +
+  scale_fill_manual(values = c("blue", "red")) +
+  # theme_minimal() +
+  labs(x = "Track constancy", y = "Mean log-DTW cost") + 
+  scale_x_discrete(
+    labels = c("familiar" = "Constant", "unfamiliar" = "Variable")
+  ) +
+  theme(legend.position = "none",
+    axis.title.x = element_text(size = 14),  # X-axis label font size
+    axis.title.y = element_text(size = 14),   # Y-axis label font size
+    axis.text.x = element_text(size = 10),   # tick labels on x-axis
+    axis.text.y = element_text(size = 10)    # tick labels on y-axis
+  )
+
+dtw_plot2_log
+
+```
+
+
+# Mixed-effects model
+```{r}
+
+e2.dtw.data3 <- e2.dtw.data %>%
+  mutate(
+    condition = as.factor(condition),
+    subject_id = as.factor(subject_id),
+    track_segment = as.factor(track_segment),
+    log_DTW = log(DTW_score)
+  )
+
+model <- lmer(log_DTW ~ condition + (1 | subject_id),
+              data = e2.dtw.data3)
+summary(model)
+
+model2 <- lmer(log_DTW ~ condition + track_segment +
+              (1 | subject_id),
+              data = e2.dtw.data3)
+summary(model2)
+
+model3 <- lmer(log_DTW ~ condition + track_segment +
+              (1 | subject_id) + (1 | track_segment),
+              data = e2.dtw.data3)
+summary(model3)
+
+```
+
+
+```{r}
+
+
+
+plot_data <- data.frame(
+  condition = c("Constant", "Variable"),
+  mean = c(11.56, 5.58),
+  lower = c(8.89, 3.60),
+  upper = c(14.23, 7.57)
+)
+
+accuracy_plot <- ggplot(
+  plot_data,
+  aes(x = condition, y = mean, fill = condition, color = condition)
+) +
+  geom_point(shape = 21, size = 4) +
+  geom_errorbar(
+    aes(ymin = lower, ymax = upper),
+    width = 0.1,
+    linewidth = 0.8
+  ) +
+  scale_fill_manual(values = c(
+    "Constant" = "blue",
+    "Variable" = "red"
+  )) +
+  scale_color_manual(values = c(
+    "Constant" = "blue",
+    "Variable" = "red"
+  )) +
+  labs(
+    x = "Track constancy",
+    y = "Mean accuracy score"
+  ) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  )
+
+accuracy_plot
+
+ggsave("accuracy_plot.png", plot = accuracy_plot, width = 4.83, height = 2.53, dpi = 300)
+ggsave("accuracy_plot.svg", plot = accuracy_plot, width = 4.83, height = 2.53)
+```
+
