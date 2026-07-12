@@ -48,7 +48,7 @@ Recommended order:
         - `data/drawing_scores_exp1.csv` (Post-test 2)
 
 2. Run ANCOVA scripts (each can be run independently after packages are installed):
-    - `R_scripts/ancova_mean_speed_analysis.R`
+    - `R_scripts/ancova_mean_speed.R`
     - `R_scripts/ancova_sd_speed.R`
     - `R_scripts/ancova_sd_lane_dev.R`
     - `R_scripts/ancova_steering_acceleration.R`
