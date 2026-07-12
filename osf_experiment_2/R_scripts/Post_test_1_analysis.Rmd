@@ -1,0 +1,265 @@
+---
+title: "Exp 2 Analysis of DTW"
+author:
+  - Your name here
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: no
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+require(knitr)
+knitr::opts_chunk$set(echo = TRUE,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+
+# Step 1: Preliminaries
+```{r results="hide", message=FALSE}
+
+# clear the workspace
+rm(list = ls())
+
+# load the following packages:
+library(tidyverse)
+library(psych)
+library(qqplotr)
+library(pastecs)
+library(scales)
+library(ez)
+library(effectsize)
+library(Hmisc)
+library(rstatix)
+
+library(lme4)
+library(lmerTest)   # adds p-values
+library(emmeans)    # for estimated means
+
+
+```
+
+# Step 2: Import the data
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Set working directory to osf_experiment_2 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
+e2.dtw.data <- read.csv("./data/dtw_data_exp2.csv", header = TRUE)
+
+# convert to factor
+e2.dtw.data$subject_id <- as.factor(e2.dtw.data$subject_id)
+e2.dtw.data$Segments <- as.factor(e2.dtw.data$Segments)
+e2.dtw.data$Condition <- as.factor(e2.dtw.data$Condition)
+
+# rename columns to match Exp 1 column names
+names(e2.dtw.data)[names(e2.dtw.data) == "Segments"] <- "track_segment"
+names(e2.dtw.data)[names(e2.dtw.data) == "Condition"] <- "condition"
+names(e2.dtw.data)[names(e2.dtw.data) == "Segment.Costs"] <- "DTW_score"
+
+# cap_value <- 0.5
+# e2.dtw.data$DTW_score <- pmin(e2.dtw.data$DTW_score, cap_value)
+
+e2.dtw.data$track_segment <- factor(
+  e2.dtw.data$track_segment,
+  levels = c(
+    "chicane",
+    "triple_s",
+    "symmetric_parabolic",
+    "traffic_circle",
+    "asymmetric_parabolic_1",
+    "t_turn",
+    "asymmetric_parabolic_2",
+    "spiral"
+  ),
+  labels = c(
+    "Chicane",
+    "Triple-S",
+    "Symm. Parab.",
+    "Traffic Circle",
+    "Asym. Parab. 1",
+    "T-turn",
+    "Asym. Parab. 2",
+    "Spiral"
+  )
+)
+
+# add a column with the log DTW score
+e2.dtw.data <- e2.dtw.data %>%
+  mutate(log_DTW_score = log(DTW_score))
+
+
+```
+
+# Histograms showing distribution of raw scores and log-transformed scores
+```{r}
+
+
+ggplot(e2.dtw.data, aes(x = DTW_score)) +
+  geom_histogram(color = "black", fill = "gray80") +
+  facet_grid(track_segment ~ condition) +
+  labs(
+    x = "DTW Cost",
+    y = "Count",
+    title = "Histograms of DTW Cost by Track Segment and Condition"
+  ) +
+  theme_minimal()
+
+ggplot(e2.dtw.data, aes(x = log_DTW_score)) +
+  geom_histogram(color = "black", fill = "gray80") +
+  facet_grid(track_segment ~ condition) +
+  labs(
+    x = "log DTW Cost",
+    y = "Count",
+    title = "Histograms of DTW Cost by Track Segment and Condition"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+# Plot of log DTW scores by segment for each condition
+```{r}
+
+log_dtw_by_segment_plot <- ggplot(data = e2.dtw.data, aes(x = track_segment, y = log_DTW_score, color = condition, group = condition)) + 
+  stat_summary(fun = mean, geom = "point", position = position_dodge(width = 0.3)) +
+  stat_summary(fun = mean, geom = "line", position = position_dodge(width = 0.3)) +
+  stat_summary(fun.data = mean_cl_boot, geom = "errorbar", width = 0.1, position = position_dodge(width = 0.3)) +
+  # theme_minimal() +
+  labs(x = "Track segment", y = "Mean log DTW cost") + 
+  scale_x_discrete(
+    labels = c("control" = "Control", "sl" = "Scrambled Landmarks", "ss" = "Scrambled Segments")
+  ) +
+  scale_color_manual(values = c(
+    "control" = "blue",      # Control
+    "sl" = "red",     # Scrambled Landmarks
+    "ss" = "green"     # Scrambled Segments
+  ),
+  labels = c(
+    "control" = "Control",
+    "sl" = "Scrambled Landmarks",
+    "ss" = "Scrambled Segments"
+  )) +
+  theme(legend.position = c(0.025, 0.95),
+        legend.justification = c("left", "top"),
+        legend.title = element_blank(),
+        legend.background = element_rect(fill = "transparent", color = NA),
+        legend.box.background = element_rect(fill = "transparent", color = NA),
+        legend.text = element_text(size = 12),
+        axis.title.x = element_text(size = 14),  # X-axis label font size
+        axis.title.y = element_text(size = 14),   # Y-axis label font size
+        axis.text.x  = element_text(size = 10, angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 10)    # tick labels on y-axis
+  )
+
+log_dtw_by_segment_plot
+
+log_dtw_plot <- ggplot(
+  data = e2.dtw.data,
+  aes(
+    x = condition,
+    y = log_DTW_score,
+    fill = condition,
+    color = condition
+  )
+) +
+  stat_summary(
+    fun = mean,
+    geom = "point",
+    shape = 21,
+    size = 4
+  ) +
+  stat_summary(
+    fun.data = mean_cl_boot,
+    geom = "errorbar",
+    width = 0.1
+  ) +
+  scale_fill_manual(values = c(
+    "control" = "blue",      # Control
+    "sl" = "red",     # Scrambled Landmarks
+    "ss" = "green"     # Scrambled Segments
+  )) +
+  scale_color_manual(values = c(
+    "control" = "blue",      # Control
+    "sl" = "red",     # Scrambled Landmarks
+    "ss" = "green"     # Scrambled Segments
+  )) +
+  labs(x = "Track constancy", y = "Mean Log DTW cost") +
+  scale_x_discrete(
+    labels = c(
+      "control" = "Control",      # Control
+      "sl" = "Scrambled Landmarks",     # Scrambled Landmarks
+      "ss" = "Scrambled Segments"     # Scrambled Segments
+    )
+  ) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  )
+
+log_dtw_plot
+
+ggsave("log_dtw_plot.png", plot = log_dtw_plot, width = 4.83, height = 2.53, dpi = 300)
+
+
+```
+
+# Average log-transformed DTW scores across track segment and run a one-way anova
+```{r}
+
+e2.dtw.data_log <- e2.dtw.data %>%
+  mutate(log_DTW = log(DTW_score)) %>%   # natural log
+  group_by(subject_id, condition) %>%
+  summarise(mean_log_DTW = mean(log_DTW, na.rm = TRUE),
+            .groups = "drop")
+
+# Calculate means and 95% CIs
+e2.dtw.data_log %>%
+  group_by(condition) %>%
+  get_summary_stats(mean_log_DTW, type = "mean_ci") %>%
+  mutate(
+    ci_lower = mean - ci,
+    ci_upper = mean + ci
+  )
+
+log_dtw_plot <- ggplot(
+  data = e2.dtw.data_log,
+  aes(x = condition, y = mean_log_DTW, color = condition)
+) + 
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", linewidth = 0.75, width = 0.1) +
+  scale_color_manual(values = c("blue", "red", "springgreen3")) +
+  labs(x = "Track constancy", y = "Mean log(DTW cost)") + 
+  scale_x_discrete(
+    labels = c(
+      "control" = "Control",
+      "sl" = "Scrambled Landmarks",
+      "ss" = "Scrambled Segments"
+    )
+  ) +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10)
+  )
+
+log_dtw_plot
+
+dtw.aov <- anova_test(
+  data = e2.dtw.data_log, dv = mean_log_DTW, wid = subject_id,
+  between = condition,effect.size = "pes"
+)
+
+```
+
