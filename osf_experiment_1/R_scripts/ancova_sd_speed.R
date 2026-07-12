@@ -96,4 +96,3 @@ sd_speed_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_speed_de
 
 # Display the plot
 sd_speed_plot_ancova
-

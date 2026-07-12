@@ -99,32 +99,3 @@ mean_steering_acc_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = me
 
 # Display the plot
 mean_steering_acc_plot_ancova
-library(emmeans)
-library(dplyr)
-
-# Fit the ANCOVA model using the correct data and variable names
-model <- lm(mean_steering_acceleration ~ condition * visibility + total_steering_acceleration_1,
-            data = mean_steering_dev_df_2)
-
-# Get estimated marginal means (adjusted for covariate)
-emm_results <- emmeans(model, ~ condition | visibility)
-
-# Summarize with means, SEs, and 95% confidence intervals
-summary_df <- summary(emm_results, infer = c(TRUE, TRUE)) %>%
-  rename(
-    mean = emmean,
-    lower_ci = lower.CL,
-    upper_ci = upper.CL
-  ) %>%
-  mutate(
-    mean = round(mean, 2),
-    SE = round(SE, 2),
-    lower_ci = round(lower_ci, 2),
-    upper_ci = round(upper_ci, 2)
-  )
-
-# Print APA-style table
-print(summary_df)
-
-# Display the plot
-mean_steering_acc_plot_ancova

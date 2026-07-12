@@ -97,7 +97,3 @@ sd_lane_dev_plot_ancova <- ggplot(adj_means_df, aes(x = visibility, y = sd_lane_
 
 # Display the plot
 sd_lane_dev_plot_ancova
-
-
-# Display the plot
-mean_steering_acc_plot_ancova
