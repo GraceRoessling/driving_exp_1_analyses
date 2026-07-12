@@ -2,9 +2,9 @@ library(ggplot2)
 library(tidyverse)
 library(effectsize)
 
-
-csv_path = "C:\\Users\\graci\\Dropbox\\PAndA\\Thesis Experiment 2\\data\\drawing_scores.csv"
-data = read.csv(csv_path,stringsAsFactors=TRUE)
+# Set working directory to osf_experiment_1 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
+data = read.csv("./data/drawing_scores_exp1.csv",stringsAsFactors=TRUE)
 
 # Remap familiar/unfamiliar to constant/variable
 data$condition <- recode(data$condition, "familiar" = "constant", "unfamiliar" = "variable")
