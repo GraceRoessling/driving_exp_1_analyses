@@ -1,6 +1,9 @@
+# Speed Variance with Steering Acceleration Covariate ----------------------------------------------------------------
+# Set working directory to osf_experiment_1 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
 
-# Analysis 8: Speed Variance with Steering Acceleration Covariate ----------------------------------------------------------------
-
+# Load shared data/functions (main_df, apa_regression, apa_spearman)
+source("./R_scripts/shared_variables_file.R")
 
 main="SD of Speed for Repeated vs Varied Track Groups"
 

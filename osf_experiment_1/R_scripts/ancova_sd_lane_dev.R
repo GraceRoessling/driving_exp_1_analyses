@@ -1,4 +1,9 @@
-# Analysis 8: Lane Deviation Variance with Steering Acceleration Covariate ----------------------------------------------------------------
+# Lane Deviation Variance with Steering Acceleration Covariate ----------------------------------------------------------------
+# Set working directory to osf_experiment_1 folder
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path) %>% dirname())
+
+# Load shared data/functions (main_df, apa_regression, apa_spearman)
+source("./R_scripts/shared_variables_file.R")
 
 main="SD of Lane Deviation for Repeated vs Varied Track Groups"
 
@@ -96,41 +101,3 @@ sd_lane_dev_plot_ancova
 
 # Display the plot
 mean_steering_acc_plot_ancova
-library(emmeans)
-library(dplyr)
-
-# Fit the ANCOVA model using the correct data and variable names
-model <- lm(sd_lane_dev ~ condition * visibility + total_steering_acceleration_1,
-            data = sd_lane_dev_df_2)
-
-# Get estimated marginal means (adjusted for covariate)
-emm_results <- emmeans(model, ~ condition | visibility)
-
-# Summarize with means, SEs, and 95% confidence intervals
-summary_df <- summary(emm_results, infer = c(TRUE, TRUE)) %>%
-  rename(
-    mean = emmean,
-    lower_ci = lower.CL,
-    upper_ci = upper.CL
-  ) %>%
-  mutate(
-    mean = round(mean, 2),
-    SE = round(SE, 2),
-    lower_ci = round(lower_ci, 2),
-    upper_ci = round(upper_ci, 2)
-  )
-
-# Print APA-style table
-print(summary_df)
-
-# Post-hoc: Compare condition within each visibility level
-pwc_condition_by_visibility <- sd_lane_dev_df_2 %>% 
-  group_by(visibility) %>%
-  emmeans_test(
-    sd_lane_dev ~ condition, 
-    covariate = total_steering_acceleration_1,
-    p.adjust.method = "bonferroni"
-  )
-
-# Print to inspect significance of condition differences at each visibility level
-print(pwc_condition_by_visibility)
