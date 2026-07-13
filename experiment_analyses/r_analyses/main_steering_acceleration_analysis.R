@@ -33,7 +33,7 @@ mean_steering_acceleration_plot <- ggplot(steering_acceleration_plot_df, aes(x =
   larger_text_theme(base_size = 12)+
   theme(legend.position="none") +
   coord_fixed(ratio = 0.04)+
-  theme(legend.position="none")
+  theme(legend.position="top")
 
 mean_steering_acceleration_plot
 
@@ -44,11 +44,8 @@ steering_acceleration_df <- main_df %>%
 
 steering_acceleration.aov <- anova_test(
   data = steering_acceleration_df, dv = steering_acceleration, wid = subject_id,
-  between = condition, within = visibility
+  between = condition, within = visibility,effect.size = "pes"
 )
 
 get_anova_table(steering_acceleration.aov)
 
-mean_steering_anova <- aov(steering_acceleration ~ condition*visibility + Error(subject_id/visibility), steering_acceleration_df)
-summary(mean_steering_anova)
-eta_squared(mean_steering_anova, partial = TRUE)

@@ -30,13 +30,57 @@ mean_values$condition <- factor(mean_values$condition,
 
 
 within_steering_acceleration_plot <- ggplot(mean_values, aes(x = column_name, y = mean, color = condition, group = condition)) +
-  geom_point(position=pd_for_within,size = geom_point_size) +
-  geom_line(position=pd_for_within, size = line_size) +
+  geom_point(position=pd_for_within,size = 5) +
+  geom_line(position=pd_for_within,size = line_size) +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2,position=pd_for_within) +
-  labs(x = "Trials", y = bquote("Mean Abs. Steering\nAcceleration ( deg/"~s^2~")"), color = "Track Constancy") +
+  labs(x = "Trials", y = bquote("Mean Abs. Steering Acceleration ( deg /"~s^2~")"), color = "Track Constancy", title = "Steering Acceleration Across Trials") +
   scale_x_discrete(labels = 1:10) +
-  larger_text_theme(base_size = 12)+
-  coord_fixed(ratio = 0.4)+
-  theme(legend.position = "none")
+  scale_color_manual(values = c("Constant Track" = "#0000FF", "Variable Track" = "#FF4040")) +  # Replace with actual condition levels
+  larger_text_theme(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 20),
+    axis.title.x = element_text(size = 40),
+    axis.title.y = element_text(size = 20),
+    axis.text.x = element_text(size = 30),
+    axis.text.y = element_text(size = 30)
+  )
 
 within_steering_acceleration_plot
+
+
+
+# Required libraries
+library(tidyverse)
+library(afex)       # For rmANOVA
+library(emmeans)    # For post hoc contrasts, if needed
+
+# --- Step 1: Prepare long-format data for RM-ANOVA ---
+long_data_anova <- main_df %>%
+  select(subject_id, condition, starts_with("avg_steering_acceleration")) %>%
+  pivot_longer(
+    cols = starts_with("avg_steering_acceleration"),
+    names_to = "trial",
+    names_pattern = "avg_steering_acceleration_(\\d+)",  # Extract trial number
+    values_to = "steering_acceleration"
+  ) %>%
+  mutate(
+    trial = as.factor(trial),
+    condition = factor(condition, levels = c("familiar", "unfamiliar"),
+                       labels = c("Constant Track", "Variable Track"))
+  )
+
+# --- Step 2: Run repeated-measures ANOVA ---
+anova_result <- aov_ez(
+  id = "subject_id",
+  dv = "steering_acceleration",
+  within = "trial",
+  between = "condition",
+  data = long_data_anova,
+  type = 3,
+  return = "afex_aov",
+  es = "pes"  # <-- Change effect size to partial eta squared
+)
+
+# --- Step 3: Print summary ---
+print(anova_result)

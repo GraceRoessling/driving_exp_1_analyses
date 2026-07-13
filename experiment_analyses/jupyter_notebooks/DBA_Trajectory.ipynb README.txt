@@ -1,0 +1,38 @@
+﻿This Python script analyzes driving experiment data using Dynamic Time Warping (DTW) and Dynamic Barycenter Averaging (DBA) to compute average trajectories for familiar and unfamiliar subject groups, focusing on Trial 11.
+Overview
+* Purpose: Calculate barycenters (average trajectories) for familiar and unfamiliar groups using DTW-based averaging and visualize results.
+* Output: Barycenter trajectories and optional DTW cost between them.
+Prerequisites
+* Python: 3.8+
+* Packages: numpy, scipy, matplotlib, pandas
+pip install numpy scipy matplotlib pandas
+* Data: CSV files in a main_data folder, parsed by a preprocess module.
+Setup
+   1. Clone Repo:
+git clone <repository-url>
+cd <repository-directory>
+      2. Set Paths:
+      * experiment_analyses_dir: Path to experiment_analyses folder.
+experiment_analyses_dir = r"C:\path\to\experiment_analyses"
+      * SUBJECT_PATH: Path to main_data folder.
+SUBJECT_PATH = r"C:\path\to\main_data"
+         3. Ensure preprocess: Provide or implement the preprocess module to load data.
+Usage
+         * Run:
+python script_name.py
+         * Workflow:
+            * Loads data into subject_dict using preprocess.run.
+            * Extracts Trial 11 trajectories for familiar and unfamiliar groups.
+            * Computes barycenters using pairwise DTW averaging (via getCostMatrix).
+            * Optionally plots the centerline trajectory.
+            * Groups:
+            * Familiar: 13 subjects (e.g., baggy, excludes wad).
+            * Unfamiliar: 12 subjects (e.g., atom).
+            * Track Pieces: 8 segments (e.g., chicane, spiral).
+Code Details
+            * DTW: getCostMatrix computes the warping path and cost matrix; dtw_cost_and_path provides an alternative DTW implementation.
+            * DBA: Pairwise averaging iteratively updates barycenters by averaging aligned points.
+            * Data: Trajectories are 2D pos_x, pos_z arrays.
+Results
+            * Outputs barycenter trajectories for both groups.
+            * Optionally visualizes the centerline trajectory.

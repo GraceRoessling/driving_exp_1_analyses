@@ -30,12 +30,12 @@ mean_ld_plot <- ggplot(mean_lane_dev_plot_df, aes(x = visibility, y = mean_lane_
   scale_y_continuous(breaks = round(seq(-10, 10, by = 0.5),1))+
   geom_line(position=pd_for_main, size=1.04) +
   geom_errorbar( aes(x=visibility, ymin=confidence_interval_lower, ymax=confidence_interval_upper), size = 0.8, width=0.1,alpha=0.9,position=pd_for_main) +
-  labs(x = "Visibility", y = "Mean Abs. Lane \n Deviation (meters)", color = "Track Constancy") +
+  labs(x = "Visibility", y = "Mean Lane \n Deviation (meters)", color = "Track Constancy") +
   scale_x_discrete(labels =c("High", "Low"),expand = c(0, 0.1)) +
   scale_y_continuous(breaks=number_ticks(5))+
-  coord_fixed(ratio = 1.5)+
+  #coord_fixed(ratio = 1.5)+
   larger_text_theme(base_size = 12)+
-  theme(legend.position="none")+
+  theme(legend.position="top")+
   theme(plot.margin = unit(c(0.15, 0.15, 0.15, 0.15), 
                            "inches")) 
 
@@ -48,14 +48,11 @@ mean_lane_dev_df <- main_df %>%
 
 mean_lane_dev.aov <- anova_test(
   data = mean_lane_dev_df, dv = mean_lane_dev, wid = subject_id,
-  between = condition, within = visibility
+  between = condition, within = visibility,effect.size = "pes"
 )
 
 mean_lane_dev_table <- get_anova_table(mean_lane_dev.aov)
 
-mean_lane_dev_anova <- aov(mean_lane_dev ~ condition*visibility + Error(subject_id/visibility), mean_lane_dev_df)
-summary(mean_lane_dev_anova)
-eta_squared(mean_lane_dev_anova, partial = TRUE)
 
 # Analysis 5: Var Lane Deviation ----------------------------------------------------------------
 
@@ -82,16 +79,16 @@ sd_ld_plot <- ggplot(sd_lane_dev_plot_df, aes(x = visibility, y = sd_lane_devs, 
   geom_point(position=pd_for_main, size=3) +
   geom_line(position=pd_for_main, size=1.04) +
   geom_errorbar( aes(x=visibility, ymin=confidence_interval_lower, ymax=confidence_interval_upper), width=0.1,size=0.8, alpha=0.9,position=pd_for_main) +
-  labs(x = "Visibility", y = "SD of Abs. Lane \n Deviation (meters)", color = "Track Exposure") +
+  labs(x = "Visibility", y = "SD of Lane \n Deviation (meters)", color = "Track Exposure") +
   scale_x_discrete(labels =c("High", "Low"),expand = c(0, 0.1)) +
   larger_text_theme(base_size = 12)+
-  coord_fixed(ratio = 2)+
-  theme(legend.position="none")
+  #coord_fixed(ratio = 2)+
+  theme(legend.position="top")
 
 sd_ld_plot
 
 (mean_ld_plot | sd_ld_plot) + 
-  plot_layout(heights = c(1, 1)) +
+  #plot_layout(heights = c(1, 1)) +
   plot_annotation(tag_levels = 'A')
 
 # Long format
@@ -101,11 +98,7 @@ sd_lane_dev_df <- main_df %>%
 
 sd_lane_dev.aov <- anova_test(
   data = sd_lane_dev_df, dv = sd_lane_dev, wid = subject_id,
-  between = condition, within = visibility
+  between = condition, within = visibility,effect.size = "pes"
 )
 
 get_anova_table(sd_lane_dev.aov)
-
-sd_lane_dev_anova <- aov(sd_lane_dev ~ condition*visibility + Error(subject_id/visibility), sd_lane_dev_df)
-summary(sd_lane_dev_anova)
-eta_squared(sd_lane_dev_anova, partial = TRUE)

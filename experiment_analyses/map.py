@@ -1,121 +1,91 @@
 import dataframe_helper_functions
+import pandas as pd
+import os
 
 class Map:
     "This is the map class. A map is an environment that contains the track that the subject drives on. There is one map per trial."
     map_pieces_dict = {
-        "1" : {"high_visibility": ["straight_long","u_turn_long","left_turn_short","left_turn_long","straight_short"],
-        "low_visibility": ["left_turn_med","right_turn_short", "s_turn_short"]},
+        "1" : {"high_visibility": ["long_straight","short_straight_1","u_turn","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_1","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_3","short_straight_8"],
+        "low_visibility": ["zig_zag"]},
 
-        "2": {"high_visibility": ["straight_long", "left_turn_short", "s_turn_short", "u_turn_long","right_turn_short", "left_turn_long", "straight_short"],
-        "low_visibility": ["left_turn_med"]},
+        "2": {"high_visibility": ["long_straight","large_horseshoe","short_straight_1","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
+        "low_visibility": ["u_turn"]},
 
-        "3" :{"high_visibility": ["right_turn_med", "right_turn_long","straight_long", "s_turn_long", "u_turn_short", "right_turn_short", "straight_short"],
-        "low_visibility": ["left_turn_short"]},
+        "3" :{"high_visibility": ["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","short_straight_8"],
+        "low_visibility": ["turn_3"]},
 
-        "4":{"high_visibility": ["left_turn_short", "s_turn_long", "straight_short", "right_turn_short", "straight_long", "right_turn_long", "left_turn_med"],
-        "low_visibility": ["u_turn_short"]},
+        "4":{"high_visibility": ["long_straight","turn_1","short_straight_1","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","short_straight_5","turn_3","short_straight_6","lane_convergence","short_straight_7","turn_4","short_straight_8"],
+        "low_visibility": ["y_turn"]},
 
-        "5": {"high_visibility": ["straight_short", "straight_long", "left_turn_short", "s_turn_long", "right_turn_short", "right_turn_med", "left_turn_med"],
-        "low_visibility": ["left_turn_long"]},
+        "5": {"high_visibility": ["long_straight","turn_2","short_straight_1","turn_3","short_straight_2","short_straight_3","zig_zag","short_straight_4","large_horseshoe","short_straight_5","y_turn","short_straight_6","lane_convergence","short_straight_7","turn_1","short_straight_8"],
+        "low_visibility": ["turn_4"]},
 
-        "6": {"high_visibility": ["straight_short", "right_turn_short_1", "left_turn_long", "right_turn_med", "straight_long", "s_turn_long", "right_turn_short_2"],
-        "low_visibility": ["left_turn_med"]},
+        "6": {"high_visibility": ["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","short_straight_3","turn_4","short_straight_4","short_straight_5","turn_1","short_straight_6","turn_2","short_straight_7","zig_zag","short_straight_8"],
+        "low_visibility": ["small_horseshoe"]},
 
-        "7": {"high_visibility": ["straight_long", 'right_turn_short', 'left_turn_med', "s_turn_long", "left_turn_long", "right_turn_med", "straight_short"],
-        "low_visibility": ["left_turn_short"]},
+        "7": {"high_visibility": ["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","turn_3","short_straight_6","turn_4","short_straight_7","short_straight_8"],
+        "low_visibility": ["zig_zag"]},
 
-        "8": {"high_visibility": ["left_turn_short", "u_turn_long", "straight_long", "left_turn_long", "right_turn_short", "left_turn_med", "straight_short"],
-        "low_visibility": ["right_turn_med"]},
+        "8": {"high_visibility": ["long_straight","short_straight_1","u_turn","short_straight_2","turn_1","short_straight_3","small_horseshoe","short_straight_4","lane_convergence","short_straight_5","turn_3","short_straight_6","y_turn","short_straight_7","turn_5","short_straight_8"],
+        "low_visibility": ["turn_2"]},
 
-        "9": {"high_visibility": ["straight_long", "left_turn_med", "right_turn_med", "left_turn_short", "u_turn_long", "right_turn_short", "straight_short"],
-        "low_visibility": ["left_turn_long"]},
+        "9": {"high_visibility": ["long_straight","turn_4","short_straight_1","turn_4","short_straight_2","u_turn","short_straight_3","lane_convergence","short_straight_4","short_straight_5","zig_zag","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
+        "low_visibility": ["y_turn"]},
 
-        "10": {"high_visibility": ["straight_long", "right_turn_med", "right_turn_long", "left_turn_med", "u_turn_long", "left_turn_short","straight_short"],
-        "low_visibility": ["right_turn_short"]}
+        "10": {"high_visibility": ["long_straight","chicane","short_straight_1","short_straight_2","short_straight_3","traffic_circle","short_straight_4","asymmetric_parabolic_2","short_straight_5","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
+        "low_visibility": ["triple_s","symmetric_parabolic","t_turn"]},
+
+        "11": {"high_visibility": ["chicane","triple_s","symmetric_parabolic","traffic_circle","asymmetric_parabolic_2","t_turn","asymmetric_parabolic_1","spiral","short_straight_8"],
+        "low_visibility": [None]}
         }
     
     ordinal_map_pieces_dict = {
-        "1":["straight_long","left_turn_med", "u_turn_long", "right_turn_short", "left_turn_short","s_turn_short", "left_turn_long", "straight_short"],
-        "2":["straight_long", "left_turn_med", "left_turn_short", "s_turn_short", "u_turn_long", "right_turn_short", "left_turn_long", "straight_short"],
-        "3":["right_turn_med","right_turn_long", "straight_long","s_turn_long","u_turn_short","right_turn_short", "left_turn_short", "straight_short"],
-        "4":["left_turn_short","s_turn_long", "u_turn_short", "straight_short", "right_turn_short", "straight_long", "right_turn_long", "left_turn_med"],
-        "5":["straight_short", "straight_long", "left_turn_short", "s_turn_long", "right_turn_short", "left_turn_long", "right_turn_med", "left_turn_med"],
-        "6":["straight_short", "right_turn_short_1", "left_turn_long", "right_turn_med", "left_turn_med", "straight_long", "s_turn_long", "right_turn_short_2"],
-        "7":["straight_long", "right_turn_short", "left_turn_med", "s_turn_long", "left_turn_long", "right_turn_med", 'left_turn_short', "straight_short"],
-        "8":["left_turn_short", "u_turn_long", "straight_long", "right_turn_med", "left_turn_long", "right_turn_short", "left_turn_med", "straight_short"],
-        "9":["straight_long", "left_turn_med", "right_turn_med", "left_turn_short", "u_turn_long", "right_turn_short", "left_turn_long", "straight_short"],
-        "10":["straight_long", "right_turn_med", "right_turn_long", "right_turn_short", "left_turn_med", "u_turn_long", "left_turn_short","straight_short"]
+        "1":["long_straight","zig_zag","short_straight_1","u_turn","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_1","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_3","short_straight_8"],
+        "2":["long_straight","large_horseshoe","short_straight_1","u_turn","short_straight_2","turn_4","short_straight_3","y_turn","short_straight_4","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
+        "3":["long_straight","turn_2","short_straight_1","zig_zag","short_straight_2","lane_convergence","short_straight_3","small_horseshoe","short_straight_4","turn_3","short_straight_5","y_turn","short_straight_6","turn_4","short_straight_7","turn_3","short_straight_8"],
+        "4":["long_straight","turn_1","short_straight_1","y_turn","short_straight_2","small_horseshoe","short_straight_3","u_turn","short_straight_4","turn_1","turn_3","short_straight_5","lane_convergence","short_straight_6","turn_4","short_straight_7","short_straight_8"],
+        "5":["long_straight","turn_2","short_straight_1","turn_3","short_straight_2","turn_4","short_straight_3","zig_zag","short_straight_4","large_horseshoe","short_straight_5","y_turn","short_straight_6","lane_convergence","short_straight_7","turn_1","short_straight_8"],
+        "6":["long_straight","turn_3","short_straight_1","y_turn","short_straight_2","lane_convergence","turn_4","short_straight_3","small_horseshoe","short_straight_4","turn_1","short_straight_5","turn_2","short_straight_6","zig_zag","short_straight_7"],
+        "7":["long_straight", "turn_3", "short_straight_1", "lane_convergence","short_straight_2","large_horseshoe","short_straight_3","y_turn","short_straight_4","turn_2","short_straight_5","zig_zag","short_straight_6","turn_3","short_straight_7","turn_4","short_straight_8"],
+        "8":["long_straight","turn_2","short_straight_1","u_turn","short_straight_2","turn_1","short_straight_3","small_horseshoe","short_straight_4","lane_convergence","short_straight_5","turn_3","short_straight_6","y_turn","short_straight_7","turn_5","short_straight_8"],
+        "9":["long_straight","turn_4","short_straight_1","turn_4","short_straight_2","u_turn","short_straight_3","lane_convergence","short_straight_4","y_turn","short_straight_5","zig_zag","short_straight_6","turn_2","short_straight_7","turn_1","short_straight_8"],
+        "10":["long_straight","chicane","short_straight_1","triple_s","short_straight_2","symmetric_parabolic","short_straight_3","traffic_circle","short_straight_4","asymmetric_parabolic_2","short_straight_5","t_turn","short_straight_6","asymmetric_parabolic_1","short_straight_7","spiral","short_straight_8"],
+        "11":["chicane","triple_s","symmetric_parabolic","traffic_circle","asymmetric_parabolic_2","t_turn","asymmetric_parabolic_1","spiral","short_straight_8"],
     }
-
-# list in order of correction (rather than order of pieces along track)
-    track_piece_rotation_issue = {
-        "1":{"straight_short" : [90, "left_turn_long", ("end","start")]},
-        "2":{"straight_long": [0, "left_turn_med",("start", "start")], "straight_short": [0,"left_turn_long", ("end","end")]},
-        "3":{"right_turn_med" :[0, "right_turn_long", ("end", "end")],"straight_long": [0, "right_turn_long", ("start", "start")], "straight_short":[0, "left_turn_short", ("start", "end")]},
-        "4":{"straight_short":[0, "u_turn_short",("end", "start")], "straight_long":[90, "right_turn_short", ("start", "end")]},
-        "5":{"straight_long" : [90, "left_turn_short",("end","start")],"straight_short" : [90,"straight_long",("end","start")]},
-        "6":{"right_turn_short_1":[0,"left_turn_long", ("end", "start")],"straight_short":[0, "right_turn_short_1", ("start", "start")],"straight_long":[0, "left_turn_med", ("start", "end")], "right_turn_short_2": [0, "s_turn_long", ("end", "end")]},
-        "7":{"straight_long":[0, "right_turn_short", ("start", "start")], 'left_turn_short':[0, "right_turn_med", ("start", "start")], "straight_short":[90,"left_turn_short", ("end", "end")]},
-        "8":{"straight_long":[0,"u_turn_long",("end","end")], "straight_short":[0, "left_turn_med", ("start", "end")]},
-        "9":{"straight_long" : [90, "left_turn_med",("end","end")],"straight_short": [0, "left_turn_long",("end","end")]},
-        "10":{"straight_long":[0, "right_turn_med", ("start", "start")],"straight_short":[90, "left_turn_short", ("start", "end")]}
-    }
-
-    
+   
     def __init__(self,subject,trial):
         self.subject_id = subject.id
         self.trial = trial
-        self.map_number,self.pieces,self.dict = self.get_ordinal_map(trial,subject)
+        self.map_number,self.pieces,self.dict = self.get_ordinal_map(trial)
+        self.reset_counts_dict = self.get_instances_of_repeating_sequences(trial, self.map_number)
+        self.centerline_df = self.get_centerline_for_map(self.map_number)
 
-
-
-    def get_ordinal_map(self, trial,subject):
-        # get desired map dictionary
-        if subject.condition == "familiar":
-            map_of_interest = self.map_pieces_dict["1"]
-            high_vis,low_vis = map_of_interest.values()
-            specific_map_track_pieces = high_vis + low_vis
-            map_number = str(1)
-
-        elif subject.condition == "unfamiliar":
-            driving_sim_df = trial.paths["Vehicle_DrivingSim"]
-
-            # if DF has repeating track pieces, label them separately (only for map 6)
-            if dataframe_helper_functions.check_repeating_sequences(driving_sim_df): 
-                new_driving_sim_df = dataframe_helper_functions.modify_duplicate_sequences(driving_sim_df)
-
-                # make sure main dataframe is edited for consistency!
-                trial.paths["Vehicle_DrivingSim"] = new_driving_sim_df
-
-                # get the unique track pieces
-                all_track_pieces = dataframe_helper_functions.get_unique_consecutive_strings(new_driving_sim_df["current_track_piece"])
-                all_track_pieces = dataframe_helper_functions.remove_substring(all_track_pieces, "_collider")
-
-            # if DF doesn't have repeating track pieces
-            else:
-                all_track_pieces = dataframe_helper_functions.get_unique_consecutive_strings(driving_sim_df["current_track_piece"])
-                all_track_pieces = dataframe_helper_functions.remove_substring(all_track_pieces, "_collider")   
-     
-            map_1,map_2,map_3,map_4,map_5,map_6,map_7,map_8,map_9,map_10 = self.ordinal_map_pieces_dict.values()
-            list_of_map_dicts = [map_1,map_2,map_3,map_4,map_5,map_6,map_7,map_8,map_9,map_10]
-            for count,specific_map_track_pieces in enumerate(list_of_map_dicts):
-                if all_track_pieces == specific_map_track_pieces:
-                    map_number = str(count +1)
-                    map_of_interest = self.map_pieces_dict[map_number]
-                    specific_map_track_pieces = self.ordinal_map_pieces_dict[map_number]
-                    break #exit the loop
-                # else:
-                #     print("aint nothin here boy")
-                #     print("count:", count,"\n",
-                #           all_track_pieces,"\n",
-                #           specific_map_track_pieces)
-                #     print(subject.id, trial.id)
-            
+    def get_ordinal_map(self, trial):
+        trial_file_name = trial.driving_sim_filename
+        map_number = str(dataframe_helper_functions.extract_map_number(trial_file_name))
+        map_of_interest = self.map_pieces_dict[map_number]
+        specific_map_track_pieces = self.ordinal_map_pieces_dict[map_number]
         return(map_number,specific_map_track_pieces,map_of_interest)
 
-        
+    def get_instances_of_repeating_sequences(self,trial,map_number):
+        driving_sim_df = trial.paths["Vehicle_DrivingSim"]
+        cam_position_df = trial.paths["main_camera"]
+        vehicle_position_df = trial.paths["vehicle_movement"]
+        if map_number == "11": 
+            reset_counts_dict = {}
+        else:
+            trial.paths["Vehicle_DrivingSim"], trial.paths["main_camera"],trial.paths["vehicle_movement"],reset_counts_dict = dataframe_helper_functions.clean_track_data(driving_sim_df,cam_position_df,vehicle_position_df)
+        trial.paths["Vehicle_DrivingSim"] = dataframe_helper_functions.modify_duplicate_sequences(driving_sim_df)
+        current_track_column = driving_sim_df["current_track_piece"]
+        trial.paths["main_camera"]["current_track_piece"] = current_track_column
+        trial.paths["vehicle_movement"]["current_track_piece"] = current_track_column
 
+        return(reset_counts_dict)
 
-        
-    
-
+    def get_centerline_for_map(self,map_number):
+        center_points_dir = 'C:/Users/graci/Dropbox/PAndA/Thesis Experiment 2/rhino_and_grasshopper/grasshopper_points'
+        if map_number == "11":
+            centerline_df = pd.read_csv(os.path.join(center_points_dir, f"map_10_points.csv"), header=None, names=['segment', 'x', 'y'])
+        else:
+            centerline_df = pd.read_csv(os.path.join(center_points_dir, f"map_{map_number}_points.csv"), header=None, names=['segment', 'x', 'y'])
+        return centerline_df
