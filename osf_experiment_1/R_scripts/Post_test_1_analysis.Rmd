@@ -142,7 +142,6 @@ dtw_plot <- ggplot(data = e2.dtw.data, aes(x = condition, y = DTW_score, fill = 
 dtw_plot
 
 ggsave("dtw_plot.png", plot = dtw_plot, width = 4.83, height = 2.53, dpi = 300)
-ggsave("dtw_plot.svg", plot = dtw_plot, width = 4.83, height = 2.53)
 
 
 log_dtw_plot <- ggplot(
@@ -191,7 +190,6 @@ log_dtw_plot <- ggplot(
 log_dtw_plot
 
 ggsave("log_dtw_plot.png", plot = log_dtw_plot, width = 4.83, height = 2.53, dpi = 300)
-ggsave("log_dtw_plot.svg", plot = log_dtw_plot, width = 4.83, height = 2.53)
 
 # pd <- position_dodge(width = 0.4)
 # 
@@ -231,7 +229,6 @@ log_dtw_by_segment_plot <- ggplot(data = e2.dtw.data, aes(x = track_segment, y =
 log_dtw_by_segment_plot
 
 ggsave("log_dtw_by_segment_plot.png", plot = log_dtw_by_segment_plot, width = 6, height = 4, dpi = 300)
-ggsave("log_dtw_by_segment_plot.svg", plot = log_dtw_by_segment_plot, width = 6, height = 4)
 
 
 ```
@@ -296,7 +293,6 @@ dtw_plot2 <- ggplot(data = e2.dtw.data2, aes(x = condition, y = mean_DTW_score, 
 dtw_plot2
 
 ggsave("dtw_by_cond_barplot.png", plot = dtw_plot2, width = 6, height = 3, dpi = 300)
-ggsave("dtw_by_cond_barplot.svg", plot = dtw_plot2, width = 6, height = 3)
 
 
 ```
@@ -419,6 +415,5 @@ accuracy_plot <- ggplot(
 accuracy_plot
 
 ggsave("accuracy_plot.png", plot = accuracy_plot, width = 4.83, height = 2.53, dpi = 300)
-ggsave("accuracy_plot.svg", plot = accuracy_plot, width = 4.83, height = 2.53)
 ```
 
